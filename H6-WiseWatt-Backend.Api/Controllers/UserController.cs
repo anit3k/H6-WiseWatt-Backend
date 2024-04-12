@@ -26,7 +26,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
 
             if (await DoUserExist(user))
             {
-                return BadRequest("User name or Email does already exist");
+                return BadRequest("User already exist");
             }
 
             var result = await _userRepo.CreateNewUser(new UserEntity { Password = user.Password, Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email });
@@ -43,7 +43,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
 
         private async Task<bool> DoUserExist(UserDto user)
         {
-            var result = await _userRepo.ValidateUsernameEmail(new UserEntity { Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email });
+            var result = await _userRepo.ValidateUserEmail(new UserEntity { Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email });
             return result;
         }
     }

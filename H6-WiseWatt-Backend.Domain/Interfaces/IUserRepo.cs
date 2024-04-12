@@ -6,6 +6,6 @@ namespace H6_WiseWatt_Backend.Domain.Interfaces
     {
         Task<bool> CreateNewUser(UserEntity user);
         Task<UserEntity> GetUser(UserEntity user);
-        Task<bool> ValidateUsernameEmail(UserEntity user);
+        Task<bool> ValidateUserEmail(UserEntity user);
     }
 }

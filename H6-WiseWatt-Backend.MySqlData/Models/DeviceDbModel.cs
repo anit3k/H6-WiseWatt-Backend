@@ -5,6 +5,8 @@
         public int Id { get; set; }
         public string DeviceName { get; set; }
         public double PowerConsumptionPerHour { get; set; }
+        public bool IsOn { get; set; }
+        public string SerialNumber { get; set; }
         public virtual ICollection<UserDeviceDbModel> UserDevices { get; set; } = new List<UserDeviceDbModel>();
     }
 }

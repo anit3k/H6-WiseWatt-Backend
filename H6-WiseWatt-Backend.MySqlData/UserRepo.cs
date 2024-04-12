@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace H6_WiseWatt_Backend.MySqlData
 {
-    public class UserMySqlRepo : IUserRepo
+    public class UserRepo : IUserRepo
     {
         private readonly MySqlDbContext _dbContext;
 
-        public UserMySqlRepo(MySqlDbContext dbContext)
+        public UserRepo(MySqlDbContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -28,9 +28,9 @@ namespace H6_WiseWatt_Backend.MySqlData
             }
         }
 
-        public async Task<bool> ValidateUsernameEmail(UserEntity user)
+        public async Task<bool> ValidateUserEmail(UserEntity user)
         {
-            return await _dbContext.Users.AnyAsync(u => u.Firstname == user.Firstname || u.Email == user.Email);
+            return await _dbContext.Users.AnyAsync(u => u.Email == user.Email);
         }
 
         public async Task<UserEntity?> GetUser(UserEntity user)

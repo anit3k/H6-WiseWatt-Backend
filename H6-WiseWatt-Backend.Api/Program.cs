@@ -17,7 +17,8 @@ builder.Services.AddSwaggerGen();
 
 // Database and repos
 builder.Services.AddSingleton<MySqlDbContext>();
-builder.Services.AddTransient<IUserRepo, UserMySqlRepo>();
+builder.Services.AddTransient<IUserRepo, UserRepo>();
+builder.Services.AddTransient<IUserDeviceRepo, UserDeviceRepo>();
 
 // Authentication service
 builder.Services.AddTransient<IAuthService, AuthService>();

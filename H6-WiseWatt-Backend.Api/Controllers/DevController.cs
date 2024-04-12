@@ -26,7 +26,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             {
                 await _dbContext.Database.EnsureDeletedAsync();
                 await _dbContext.Database.EnsureCreatedAsync();
-                await AddDefaultUser();
+                await AddDefaultTestData();
                 return Ok("Db has been reset");
             }
             catch (Exception ex)
@@ -35,8 +35,9 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             }
         }
 
-        private async Task AddDefaultUser()
+        private async Task AddDefaultTestData()
         {
+            // Create user instance
             var user = new UserDbModel
             {
                 Firstname = "Luke",
@@ -44,19 +45,36 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 Email = "luke@skywalker.com",
                 Password = "Kode1234!"
             };
-            _dbContext.Users.Add(user);
 
+            // Create device instances
             var carCharger = new DeviceDbModel
             {
                 DeviceName = "Car Charger",
-                PowerConsumptionPerHour = 2.5
+                PowerConsumptionPerHour = 2.5,
+                IsOn = true,
+                SerialNumber = "Clever1234"
             };
             var heatPump = new DeviceDbModel
             {
                 DeviceName = "Heat Pump",
-                PowerConsumptionPerHour = 3.0
+                PowerConsumptionPerHour = 3.0,
+                IsOn = true,
+                SerialNumber = "LG1234"
             };
             _dbContext.Devices.AddRange(new[] { carCharger, heatPump });
+
+            // Associate devices with the user using the join table
+            var userCarCharger = new UserDeviceDbModel
+            {
+                Device = carCharger,
+                User = user
+            };
+            var userHeatPump = new UserDeviceDbModel
+            {
+                Device = heatPump,
+                User = user
+            };
+            _dbContext.UserDevices.AddRange(new[] { userCarCharger, userHeatPump });
 
             await _dbContext.SaveChangesAsync();
         }
