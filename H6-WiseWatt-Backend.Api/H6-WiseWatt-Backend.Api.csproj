@@ -1,14 +1,22 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>H6_WiseWatt_Backend.Api</RootNamespace>
+    <UserSecretsId>256d5274-4eb1-4390-9811-451fa0617c84</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\H6-WiseWatt-Backend.Domain\H6-WiseWatt-Backend.Domain.csproj" />
+    <ProjectReference Include="..\H6-WiseWatt-Backend.MySqlData\H6-WiseWatt-Backend.MySqlData.csproj" />
+    <ProjectReference Include="..\H6-WiseWatt-Backend.Security\H6-WiseWatt-Backend.Security.csproj" />
   </ItemGroup>
 
 </Project>

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "H6-WiseWatt-Backend.Domain"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "H6-WiseWatt-Backend.MySqlData", "H6-WiseWatt-Backend.MySqlData\H6-WiseWatt-Backend.MySqlData.csproj", "{277A8D6E-034D-408D-B78E-8242D97D5FF5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "H6-WiseWatt-Backend.Security", "H6-WiseWatt-Backend.Security\H6-WiseWatt-Backend.Security.csproj", "{8729393B-274C-403F-ABD4-EA335F0492FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{277A8D6E-034D-408D-B78E-8242D97D5FF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{277A8D6E-034D-408D-B78E-8242D97D5FF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{277A8D6E-034D-408D-B78E-8242D97D5FF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8729393B-274C-403F-ABD4-EA335F0492FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8729393B-274C-403F-ABD4-EA335F0492FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8729393B-274C-403F-ABD4-EA335F0492FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8729393B-274C-403F-ABD4-EA335F0492FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

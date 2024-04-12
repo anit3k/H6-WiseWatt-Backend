@@ -1,6 +1,6 @@
-﻿namespace H6_WiseWatt_Backend.Api.Models
+﻿namespace H6_WiseWatt_Backend.Domain.Entities
 {
-    public class UserDto
+    public class UserEntity
     {
         public string Firstname { get; set; }
         public string Lastname { get; set; }
