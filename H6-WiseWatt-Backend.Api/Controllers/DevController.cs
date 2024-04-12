@@ -26,6 +26,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             {
                 await _dbContext.Database.EnsureDeletedAsync();
                 await _dbContext.Database.EnsureCreatedAsync();
+                _dbContext.ChangeTracker.Clear();
                 await AddDefaultTestData();
                 return Ok("Db has been reset");
             }
