@@ -1,6 +1,7 @@
 ﻿using H6_WiseWatt_Backend.MySqlData;
 using H6_WiseWatt_Backend.MySqlData.Models;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace H6_WiseWatt_Backend.Api.Controllers
 {
@@ -28,11 +29,13 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 await _dbContext.Database.EnsureCreatedAsync();
                 _dbContext.ChangeTracker.Clear();
                 await AddDefaultTestData();
+                Log.Information("The Database has been reset");
                 return Ok("Db has been reset");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+                Log.Error($"An error has occurred with error message: {ex.Message}");
+                return StatusCode(500, $"Internal Server Error, contact your administrator if continues...");
             }
         }
 

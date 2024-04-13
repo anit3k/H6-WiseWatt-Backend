@@ -1,7 +1,9 @@
 ﻿using H6_WiseWatt_Backend.Api.Models;
 using H6_WiseWatt_Backend.Domain.Entities;
 using H6_WiseWatt_Backend.Domain.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace H6_WiseWatt_Backend.Api.Controllers
 {
@@ -19,24 +21,32 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         [Route("api/user/register")]
         public async Task<IActionResult> RegisterUser(UserDto user)
         {
-            if (user == null || string.IsNullOrWhiteSpace(user.Firstname) && string.IsNullOrWhiteSpace(user.Password) && string.IsNullOrWhiteSpace(user.Email))
+            try
             {
-                return BadRequest("Invalid User Information");
-            }
+                if (user == null || string.IsNullOrWhiteSpace(user.Firstname) && string.IsNullOrWhiteSpace(user.Password) && string.IsNullOrWhiteSpace(user.Email))
+                {
+                    return BadRequest("Invalid User Information");
+                }
 
-            if (await DoUserExist(user))
-            {
-                return BadRequest("User already exist");
-            }
+                if (await DoUserExist(user))
+                {
+                    return BadRequest("User already exist");
+                }
 
-            var result = await _userRepo.CreateNewUser(new UserEntity { Password = user.Password, Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email });
+                var result = await _userRepo.CreateNewUser(new UserEntity { Password = user.Password, Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email });
 
-            if (result)
-            {
-                return Ok("User has been created");
+                if (result)
+                {
+                    return Ok("User has been created");
+                }
+                else
+                {
+                    return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
+                }
             }
-            else
+            catch (Exception ex)
             {
+                Log.Error($"An error has occurred with error message: {ex.Message}");
                 return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
             }
         }

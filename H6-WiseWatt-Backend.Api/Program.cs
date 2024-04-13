@@ -3,12 +3,18 @@ using H6_WiseWatt_Backend.MySqlData;
 using H6_WiseWatt_Backend.Security;
 using H6_WiseWatt_Backend.Security.Interfaces;
 using H6_WiseWatt_Backend.Security.Models;
+using Serilog;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.File("logs/logs.txt", rollingInterval: RollingInterval.Month)
+            .CreateLogger();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
