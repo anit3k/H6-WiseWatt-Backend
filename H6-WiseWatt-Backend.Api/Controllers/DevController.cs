@@ -56,14 +56,16 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 DeviceName = "Lader til Elbil",
                 PowerConsumptionPerHour = 2.5,
                 IsOn = true,
-                SerialNumber = "Clever1234"
+                SerialNumber = "Clever1234",
+                Type = "CarCharger"
             };
             var heatPump = new DeviceDbModel
             {
                 DeviceName = "Varme pumpe",
                 PowerConsumptionPerHour = 3.0,
                 IsOn = true,
-                SerialNumber = "LG1234"
+                SerialNumber = "LG1234",
+                Type = "HeatPump"
             };
             _dbContext.Devices.AddRange(new[] { carCharger, heatPump });
 

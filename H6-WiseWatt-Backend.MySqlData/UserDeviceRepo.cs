@@ -32,6 +32,8 @@ namespace H6_WiseWatt_Backend.MySqlData
             result.DeviceName = device.DeviceName;
             result.PowerConsumptionPerHour = device.PowerConsumptionPerHour;
             result.IsOn = device.IsOn;
+            result.Type = device.Type;
+            result.SerialNumber = device.SerialNumber;
             
             await _dbContext.SaveChangesAsync();
 
@@ -46,7 +48,8 @@ namespace H6_WiseWatt_Backend.MySqlData
                 DeviceName= dbModel.DeviceName,
                 PowerConsumptionPerHour = dbModel.PowerConsumptionPerHour,
                 IsOn = dbModel.IsOn,
-                SerialNumber = dbModel.SerialNumber
+                SerialNumber = dbModel.SerialNumber,
+                Type = dbModel.Type
             };
         }
     }
