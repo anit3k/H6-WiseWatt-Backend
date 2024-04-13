@@ -53,14 +53,14 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             // Create device instances
             var carCharger = new DeviceDbModel
             {
-                DeviceName = "Car Charger",
+                DeviceName = "Lader til Elbil",
                 PowerConsumptionPerHour = 2.5,
                 IsOn = true,
                 SerialNumber = "Clever1234"
             };
             var heatPump = new DeviceDbModel
             {
-                DeviceName = "Heat Pump",
+                DeviceName = "Varme pumpe",
                 PowerConsumptionPerHour = 3.0,
                 IsOn = true,
                 SerialNumber = "LG1234"

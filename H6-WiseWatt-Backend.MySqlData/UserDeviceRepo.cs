@@ -23,13 +23,19 @@ namespace H6_WiseWatt_Backend.MySqlData
             return result;
         }
 
-        public async Task<bool> SetDeviceState(DeviceEntity device)
+        public async Task UpdateDevice(DeviceEntity device)
         {
             var result = await _dbContext.Devices
                 .Where( d => d.SerialNumber == device.SerialNumber)
                 .FirstOrDefaultAsync();
 
-            return result.IsOn;
+            result.DeviceName = device.DeviceName;
+            result.PowerConsumptionPerHour = device.PowerConsumptionPerHour;
+            result.IsOn = device.IsOn;
+            
+            await _dbContext.SaveChangesAsync();
+
+            return;
         }
 
         private static DeviceEntity MapDeviceFromDbToEntity(DeviceDbModel dbModel)
