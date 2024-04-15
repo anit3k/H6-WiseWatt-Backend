@@ -16,7 +16,7 @@ namespace H6_WiseWatt_Backend.MySqlData
 
         public async Task<bool> CreateNewUser(UserEntity user)
         {
-            _dbContext.Users.Add(new UserDbModel { Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email, Password = user.Password });
+            _dbContext.Users.Add(new UserDbModel { Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email, Password = user.Password, UserGuid = Guid.NewGuid().ToString() });
             var result = await _dbContext.SaveChangesAsync();
             if (result == 1)
             {
@@ -42,6 +42,7 @@ namespace H6_WiseWatt_Backend.MySqlData
                 Firstname = dbUser.Firstname,
                 Lastname = dbUser.Lastname,
                 Email = dbUser.Email,
+                UserGuid = dbUser.UserGuid,
             };
         }
     }

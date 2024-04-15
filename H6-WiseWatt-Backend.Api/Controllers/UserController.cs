@@ -33,7 +33,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                     return BadRequest("User already exist");
                 }
 
-                var result = await _userRepo.CreateNewUser(new UserEntity { Password = user.Password, Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email });
+                var result = await _userRepo.CreateNewUser(new UserEntity { Password = user.Password, Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email, UserGuid = "669cadd0-70cf-43a1-9a9d-426212185666" });
 
                 if (result)
                 {

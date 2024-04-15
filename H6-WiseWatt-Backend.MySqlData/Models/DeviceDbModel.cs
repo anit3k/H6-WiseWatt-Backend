@@ -1,13 +1,28 @@
-﻿namespace H6_WiseWatt_Backend.MySqlData.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace H6_WiseWatt_Backend.MySqlData.Models
 {
     public class DeviceDbModel
     {
         public int Id { get; set; }
+       
+        public string UserGuid { get; set; }
+
+        public string DeviceType { get; set; }
+
         public string DeviceName { get; set; }
-        public double PowerConsumptionPerHour { get; set; }
+
+        public string Serial { get; set; }
+
         public bool IsOn { get; set; }
-        public string SerialNumber { get; set; }
-        public string Type { get; set; }
-        public virtual ICollection<UserDeviceDbModel> UserDevices { get; set; } = new List<UserDeviceDbModel>();
+
+        public double EnergyConsumption { get; set; }
+
+        [Column(TypeName = "time")]
+        public TimeSpan OnTime { get; set; }
+
+        [Column(TypeName = "time")]
+        public TimeSpan OffTime { get; set; }
+        public int Degree { get; set; }
     }
 }

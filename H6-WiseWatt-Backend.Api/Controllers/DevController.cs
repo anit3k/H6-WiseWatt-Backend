@@ -1,4 +1,7 @@
-﻿using H6_WiseWatt_Backend.MySqlData;
+﻿using H6_WiseWatt_Backend.Domain.Entities.IotEntities;
+using H6_WiseWatt_Backend.Domain.Factories;
+using H6_WiseWatt_Backend.Domain.Interfaces;
+using H6_WiseWatt_Backend.MySqlData;
 using H6_WiseWatt_Backend.MySqlData.Models;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -9,10 +12,14 @@ namespace H6_WiseWatt_Backend.Api.Controllers
     public class DevController : ControllerBase
     {
         private readonly MySqlDbContext _dbContext;
+        private readonly IIoTDeviceFactory _deviceFactory;
+        private readonly IDeviceRepo _deviceStorageRepo;
 
-        public DevController(MySqlDbContext dbContext)
+        public DevController(MySqlDbContext dbContext, IIoTDeviceFactory deviceFactory, IDeviceRepo deviceStorageRepo)
         {
             _dbContext = dbContext;
+            _deviceFactory = deviceFactory;
+            _deviceStorageRepo = deviceStorageRepo;
         }
 
         /// <summary>
@@ -28,61 +35,44 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 await _dbContext.Database.EnsureDeletedAsync();
                 await _dbContext.Database.EnsureCreatedAsync();
                 _dbContext.ChangeTracker.Clear();
-                await AddDefaultTestData();
+                await AddDefaultTestData2();
                 Log.Information("The Database has been reset");
                 return Ok("Db has been reset");
             }
             catch (Exception ex)
             {
                 Log.Error($"An error has occurred with error message: {ex.Message}");
-                return StatusCode(500, $"Internal Server Error, contact your administrator if continues...");
+                return StatusCode(500, $"Internal Server Error, contact your administrator if continues.../n" + ex.Message);
             }
         }
 
-        private async Task AddDefaultTestData()
+        private async Task AddDefaultTestData2()
         {
-            // Create user instance
             var user = new UserDbModel
             {
                 Firstname = "Luke",
                 Lastname = "Skywalker",
                 Email = "luke@skywalker.com",
-                Password = "Kode1234!"
+                Password = "Kode1234!",
+                UserGuid = "f10774ec-bc8b-40a6-9049-32634363e298"
             };
-
-            // Create device instances
-            var carCharger = new DeviceDbModel
-            {
-                DeviceName = "Lader til Elbil",
-                PowerConsumptionPerHour = 2.5,
-                IsOn = true,
-                SerialNumber = "Clever1234",
-                Type = "CarCharger"
-            };
-            var heatPump = new DeviceDbModel
-            {
-                DeviceName = "Varme pumpe",
-                PowerConsumptionPerHour = 3.0,
-                IsOn = true,
-                SerialNumber = "LG1234",
-                Type = "HeatPump"
-            };
-            _dbContext.Devices.AddRange(new[] { carCharger, heatPump });
-
-            // Associate devices with the user using the join table
-            var userCarCharger = new UserDeviceDbModel
-            {
-                Device = carCharger,
-                User = user
-            };
-            var userHeatPump = new UserDeviceDbModel
-            {
-                Device = heatPump,
-                User = user
-            };
-            _dbContext.UserDevices.AddRange(new[] { userCarCharger, userHeatPump });
-
+            _dbContext.Users.Add(user); 
             await _dbContext.SaveChangesAsync();
-        }
+
+            var devices = new List<IoTDeviceBaseEntity>
+            {
+                _deviceFactory.CreateDevice("Dishwasher"),
+                _deviceFactory.CreateDevice("Dryer"),
+                _deviceFactory.CreateDevice("CarCharger"),
+                _deviceFactory.CreateDevice("HeatPump"),
+                _deviceFactory.CreateDevice("WashingMachine")
+            };
+
+            foreach (var device in devices)
+            {
+                device.UserGuid = user.UserGuid;
+                await _deviceStorageRepo.CreateDevice(device);
+            }
+        }        
     }
 }

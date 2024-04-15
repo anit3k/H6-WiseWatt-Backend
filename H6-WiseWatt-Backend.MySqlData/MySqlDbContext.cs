@@ -1,5 +1,7 @@
-﻿using H6_WiseWatt_Backend.MySqlData.Models;
+﻿using H6_WiseWatt_Backend.Domain.Entities.IotEntities;
+using H6_WiseWatt_Backend.MySqlData.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
 
 namespace H6_WiseWatt_Backend.MySqlData
@@ -29,21 +31,25 @@ namespace H6_WiseWatt_Backend.MySqlData
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configure primary keys
+            // Define a converter from TimeSpan to string and from string to TimeSpan
+            var timeSpanToStringConverter = new ValueConverter<TimeSpan, string>(
+                timeSpan => timeSpan.ToString(@"hh\:mm\:ss"),   // Convert TimeSpan to string
+                str => TimeSpan.Parse(str));                   // Convert string to TimeSpan
+
+
             modelBuilder.Entity<UserDbModel>().HasKey(u => u.Id);
-            modelBuilder.Entity<DeviceDbModel>().HasKey(d => d.Id);
-            modelBuilder.Entity<UserDeviceDbModel>().HasKey(ud => ud.Id);
+            modelBuilder.Entity<DeviceDbModel>().HasKey(u => u.Id);
 
-            // Configure relations
-            modelBuilder.Entity<UserDeviceDbModel>()
-                .HasOne(ud => ud.User)
-                .WithMany(u => u.UserDevices)
-                .HasForeignKey(ud => ud.UserId);
+            modelBuilder.Entity<DeviceDbModel>().Property(e => e.DeviceType).HasConversion<string>();
+            // Apply the converter to the OnTime and OffTime properties
+            modelBuilder.Entity<DeviceDbModel>().Property(p => p.OnTime)
+                .HasConversion(timeSpanToStringConverter)
+                .HasColumnType("VARCHAR(8)");  // Use VARCHAR or CHAR as appropriate
 
-            modelBuilder.Entity<UserDeviceDbModel>()
-                .HasOne(ud => ud.Device)
-                .WithMany(d => d.UserDevices)
-                .HasForeignKey(ud => ud.DeviceId);
+            modelBuilder.Entity<DeviceDbModel>().Property(p => p.OffTime)
+                .HasConversion(timeSpanToStringConverter)
+                .HasColumnType("VARCHAR(8)");  // Ensure the column type can store the string format
+        
 
             base.OnModelCreating(modelBuilder);
         }
@@ -52,7 +58,6 @@ namespace H6_WiseWatt_Backend.MySqlData
         #region Properties
         public DbSet<UserDbModel> Users { get; set; }
         public DbSet<DeviceDbModel> Devices { get; set; }
-        public DbSet<UserDeviceDbModel> UserDevices { get; set; }
         #endregion
     }
 }

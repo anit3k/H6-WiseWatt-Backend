@@ -22,7 +22,7 @@ namespace H6_WiseWatt_Backend.Security
 
             var claims = new[]
                 {
-                    new Claim(ClaimTypes.Name, user.Firstname),
+                    new Claim("UserId", user.UserGuid),
                     new Claim(ClaimTypes.Email, user.Email),
                 };
 
