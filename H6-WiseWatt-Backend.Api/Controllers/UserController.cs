@@ -86,8 +86,6 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 device.UserGuid = userGuid;
                 await _deviceRepo.CreateDevice(device);
             }
-        }
-
-       
+        }       
     }
 }

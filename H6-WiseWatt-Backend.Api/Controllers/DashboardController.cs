@@ -12,10 +12,12 @@ namespace H6_WiseWatt_Backend.Api.Controllers
     public class DashboardController : ControllerBase
     {
         private readonly IDeviceRepo _userDeviceRepo;
+        private readonly IDeviceConsumptionService _deviceConsumptionService;
 
-        public DashboardController(IDeviceRepo userDeviceRepo)
+        public DashboardController(IDeviceRepo userDeviceRepo, IDeviceConsumptionService deviceConsumptionService)
         {
             _userDeviceRepo = userDeviceRepo;
+            _deviceConsumptionService = deviceConsumptionService;
         }
 
         #region GetAllUsersDevices
@@ -32,15 +34,33 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 }
 
                 var deviceEntities = await GetCurrentUserDevices(userGuid);
-                var deviceDto = deviceEntities.Select(dm => MapToDeviceSto(dm)).ToList();
-                return Ok(deviceDto);
+                var response = GetResponseDto(deviceEntities);
+                return Ok(response);
             }
             catch (Exception ex)
             {
                 Log.Error($"An error has occurred with error message: {ex.Message}");
                 return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
             }
-        }        
+        }
+
+        private DashboardDto GetResponseDto(List<IoTDeviceBaseEntity> deviceEntities)
+        {
+            var stats = _deviceConsumptionService.CalculateStatistics(deviceEntities);
+            var result = new DashboardDto
+            {
+                Stats = new Statistics
+                {
+                    DailyPercentageByDevice = stats.DailyPercentageByDevice,
+                    DailyConsumptionByDevice = stats.DailyConsumptionByDevice,
+                    HourlyConsumptionByDevice = stats.HourlyConsumptionByDevice,
+                    TotalDailyConsumption = stats.TotalDailyConsumption
+                },
+                Devices = deviceEntities.Select(dm => MapToDeviceDto(dm)).ToList()
+            };
+            return result;
+        }
+
         #endregion
 
         #region Update Device
@@ -65,7 +85,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 Log.Error($"An error has occurred with error message: {ex.Message}");
                 return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
             }
-        }       
+        }
         #endregion
 
 
@@ -81,11 +101,11 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         private async Task<List<IoTDeviceBaseEntity>> GetCurrentUserDevices(string? userId)
         {
             Log.Information($"User {userId} request a list of all devices");
-                var result = await _userDeviceRepo.GetDevices(userId);
+            var result = await _userDeviceRepo.GetDevices(userId);
             return result;
         }
 
-        private DeviceDto MapToDeviceSto(IoTDeviceBaseEntity entity)
+        private DeviceDto MapToDeviceDto(IoTDeviceBaseEntity entity)
         {
             var model = new DeviceDto
             {

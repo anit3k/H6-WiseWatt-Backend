@@ -1,5 +1,6 @@
 using H6_WiseWatt_Backend.Domain.Factories;
 using H6_WiseWatt_Backend.Domain.Interfaces;
+using H6_WiseWatt_Backend.Domain.Services;
 using H6_WiseWatt_Backend.MySqlData;
 using H6_WiseWatt_Backend.Security;
 using H6_WiseWatt_Backend.Security.Interfaces;
@@ -27,8 +28,9 @@ builder.Services.AddSingleton<MySqlDbContext>();
 builder.Services.AddTransient<IUserRepo, UserRepo>();
 builder.Services.AddSingleton<IDeviceRepo, UserDeviceRepo>();
 
-// Domain Specific Service
+// Domain Specific Services
 builder.Services.AddSingleton<IIoTDeviceFactory, IoTDeviceFactoryImp>();
+builder.Services.AddTransient<IDeviceConsumptionService, DeviceConsumptionService>();
 
 // Authentication service
 builder.Services.AddTransient<IAuthService, AuthService>();
