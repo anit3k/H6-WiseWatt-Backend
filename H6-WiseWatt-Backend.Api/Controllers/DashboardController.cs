@@ -55,9 +55,9 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 {
                     return BadRequest("Invalid User");
                 }
-                var temp = MapToDeviceEntity(device);
-                //var deviceEntity = await _userDeviceRepo.GetDevice(device.Serial);
-                await _userDeviceRepo.UpdateDevice(temp);
+                var deviceEntity = MapToDeviceEntity(device);
+
+                await _userDeviceRepo.UpdateDevice(deviceEntity);
                 return Ok("Device Updated");
             }
             catch (Exception ex)
@@ -65,9 +65,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 Log.Error($"An error has occurred with error message: {ex.Message}");
                 return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
             }
-        }
-
-       
+        }       
         #endregion
 
 

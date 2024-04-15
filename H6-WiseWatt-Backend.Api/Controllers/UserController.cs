@@ -28,7 +28,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         {
             try
             {
-                if (user == null || string.IsNullOrWhiteSpace(user.Firstname) && string.IsNullOrWhiteSpace(user.Password) && string.IsNullOrWhiteSpace(user.Email))
+                if (IsNotValid(user))
                 {
                     return BadRequest("Invalid User Information");
                 }
@@ -39,7 +39,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 }
 
                 string userGuid = await AddNewUserToRepo(user);
-                if (userGuid != string.Empty)
+                if (IsUserGuidValid(userGuid))
                 {
                     await CreateDefaultDevicesToNewUser(userGuid);
                     return Ok("User has been created");
@@ -56,10 +56,26 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             }
         }
 
+        private bool IsNotValid(UserDto user)
+        {
+            return user == null || string.IsNullOrWhiteSpace(user.Firstname) && string.IsNullOrWhiteSpace(user.Password) && string.IsNullOrWhiteSpace(user.Email);
+        }
+
+        private async Task<bool> DoUserExist(UserDto user)
+        {
+            var result = await _userRepo.ValidateUserEmail(new UserEntity { Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email });
+            return result;
+        }
+
         private async Task<string> AddNewUserToRepo(UserDto user)
         {
             return await _userRepo.CreateNewUser(new UserEntity { Password = user.Password, Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email, UserGuid = "669cadd0-70cf-43a1-9a9d-426212185666" });
         }
+
+        private bool IsUserGuidValid(string userGuid)
+        {
+            return userGuid != string.Empty;
+        }        
 
         private async Task CreateDefaultDevicesToNewUser(string userGuid)
         {
@@ -72,10 +88,6 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             }
         }
 
-        private async Task<bool> DoUserExist(UserDto user)
-        {
-            var result = await _userRepo.ValidateUserEmail(new UserEntity { Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email });
-            return result;
-        }
+       
     }
 }

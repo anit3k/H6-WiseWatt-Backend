@@ -25,14 +25,13 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         {
             try
             {
-                if (user == null || string.IsNullOrWhiteSpace(user.Email) || string.IsNullOrWhiteSpace(user.Password))
+                if (IsNotValid(user))
                 {
                     return BadRequest("Invalid User Information");
                 }
+                UserEntity existingUser = await GetUserFromDb(user);
 
-                var existingUser = await _userRepo.GetUser(new UserEntity { Email = user.Email, Password = user.Password });
-
-                if (existingUser == null)
+                if (IsUserNull(existingUser))
                 {
                     return BadRequest("Wrong user name or password");
                 }
@@ -46,6 +45,21 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 Log.Error($"An error has occurred with error message: {ex.Message}");
                 return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
             }
+        }       
+
+        private bool IsNotValid(LoginDto user)
+        {
+            return user == null || string.IsNullOrWhiteSpace(user.Email) || string.IsNullOrWhiteSpace(user.Password);
+        }
+
+        private async Task<UserEntity> GetUserFromDb(LoginDto user)
+        {
+            return await _userRepo.GetUser(new UserEntity { Email = user.Email, Password = user.Password });
+        }
+
+        private bool IsUserNull(UserEntity existingUser)
+        {
+            return existingUser == null;
         }
     }
 }
