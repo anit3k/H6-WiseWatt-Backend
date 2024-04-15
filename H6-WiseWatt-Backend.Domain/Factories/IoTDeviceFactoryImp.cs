@@ -4,7 +4,8 @@ namespace H6_WiseWatt_Backend.Domain.Factories
 {
     public class IoTDeviceFactoryImp : IIoTDeviceFactory
     {
-        private readonly Random _random = new Random();
+        private readonly Random _random = new Random();        
+
         public IoTDeviceBaseEntity CreateDevice(string type, string name = null)
         {
             switch (type)
@@ -63,6 +64,19 @@ namespace H6_WiseWatt_Backend.Domain.Factories
                 default:
                     throw new ArgumentException("Unknown device type", nameof(type));
             }
+        }
+
+        public List<IoTDeviceBaseEntity> CreateDefaultDevices()
+        {
+            var devices = new List<IoTDeviceBaseEntity>
+            {
+                CreateDevice("Dishwasher"),
+                CreateDevice("Dryer"),
+                CreateDevice("CarCharger"),
+                CreateDevice("HeatPump"),
+                CreateDevice("WashingMachine")
+            };
+            return devices;
         }
     }
 }

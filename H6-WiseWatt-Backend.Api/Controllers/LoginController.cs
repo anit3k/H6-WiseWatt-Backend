@@ -8,12 +8,12 @@ using Serilog;
 namespace H6_WiseWatt_Backend.Api.Controllers
 {
     [ApiController]
-    public class AuthController : ControllerBase
+    public class LoginController : ControllerBase
     {
         private readonly IUserRepo _userRepo;
         private readonly IAuthService _authService;
 
-        public AuthController(IUserRepo userRepo, IAuthService authService)
+        public LoginController(IUserRepo userRepo, IAuthService authService)
         {
             _userRepo = userRepo;
             _authService = authService;

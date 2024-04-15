@@ -59,14 +59,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             _dbContext.Users.Add(user); 
             await _dbContext.SaveChangesAsync();
 
-            var devices = new List<IoTDeviceBaseEntity>
-            {
-                _deviceFactory.CreateDevice("Dishwasher"),
-                _deviceFactory.CreateDevice("Dryer"),
-                _deviceFactory.CreateDevice("CarCharger"),
-                _deviceFactory.CreateDevice("HeatPump"),
-                _deviceFactory.CreateDevice("WashingMachine")
-            };
+            var devices = _deviceFactory.CreateDefaultDevices();
 
             foreach (var device in devices)
             {

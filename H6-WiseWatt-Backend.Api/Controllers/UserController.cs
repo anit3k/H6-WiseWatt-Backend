@@ -1,5 +1,6 @@
 ﻿using H6_WiseWatt_Backend.Api.Models;
 using H6_WiseWatt_Backend.Domain.Entities;
+using H6_WiseWatt_Backend.Domain.Factories;
 using H6_WiseWatt_Backend.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,14 @@ namespace H6_WiseWatt_Backend.Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepo _userRepo;
+        private readonly IDeviceRepo _deviceRepo;
+        private readonly IIoTDeviceFactory _deviceFactory;
 
-        public UserController(IUserRepo userRepo)
+        public UserController(IUserRepo userRepo, IDeviceRepo deviceRepo, IIoTDeviceFactory deviceFactory)
         {
             _userRepo = userRepo;
+            _deviceRepo = deviceRepo;
+            _deviceFactory = deviceFactory;
         }
 
         [HttpPost]
@@ -33,10 +38,10 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                     return BadRequest("User already exist");
                 }
 
-                var result = await _userRepo.CreateNewUser(new UserEntity { Password = user.Password, Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email, UserGuid = "669cadd0-70cf-43a1-9a9d-426212185666" });
-
-                if (result)
+                string userGuid = await AddNewUserToRepo(user);
+                if (userGuid != string.Empty)
                 {
+                    await CreateDefaultDevicesToNewUser(userGuid);
                     return Ok("User has been created");
                 }
                 else
@@ -48,6 +53,22 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             {
                 Log.Error($"An error has occurred with error message: {ex.Message}");
                 return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
+            }
+        }
+
+        private async Task<string> AddNewUserToRepo(UserDto user)
+        {
+            return await _userRepo.CreateNewUser(new UserEntity { Password = user.Password, Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email, UserGuid = "669cadd0-70cf-43a1-9a9d-426212185666" });
+        }
+
+        private async Task CreateDefaultDevicesToNewUser(string userGuid)
+        {
+            var devices = _deviceFactory.CreateDefaultDevices();
+
+            foreach (var device in devices)
+            {
+                device.UserGuid = userGuid;
+                await _deviceRepo.CreateDevice(device);
             }
         }
 
