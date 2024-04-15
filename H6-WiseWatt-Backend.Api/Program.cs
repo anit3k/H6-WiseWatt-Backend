@@ -1,3 +1,4 @@
+using H6_WiseWatt_Backend.Domain.Factories;
 using H6_WiseWatt_Backend.Domain.Interfaces;
 using H6_WiseWatt_Backend.MySqlData;
 using H6_WiseWatt_Backend.Security;
@@ -5,19 +6,29 @@ using H6_WiseWatt_Backend.Security.Interfaces;
 using H6_WiseWatt_Backend.Security.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.File("logs/logs.txt", rollingInterval: RollingInterval.Month)
+            .CreateLogger();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Database and repos
+// Database and repo
 builder.Services.AddSingleton<MySqlDbContext>();
-builder.Services.AddTransient<IUserRepo, UserMySqlRepo>();
+builder.Services.AddTransient<IUserRepo, UserRepo>();
+builder.Services.AddSingleton<IDeviceRepo, UserDeviceRepo>();
+
+// Domain Specific Service
+builder.Services.AddSingleton<IIoTDeviceFactory, IoTDeviceFactoryImp>();
 
 // Authentication service
 builder.Services.AddTransient<IAuthService, AuthService>();
@@ -58,9 +69,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-
-
 
 app.UseCors("AllowAllOrigins");
 
