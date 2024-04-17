@@ -120,8 +120,9 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 var consumptionDtos = deviceData.Select(d => new HourlyConsumptionDto
                 {
                     Name = d.Key,
-                    Data = d.Value
+                    Data = d.Value.Select(x => Math.Round(x, 2)).ToList()
                 }).ToList();
+
 
                 return Ok(consumptionDtos);
             }
