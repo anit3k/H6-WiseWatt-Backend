@@ -25,7 +25,7 @@ builder.Services.AddSwaggerGen();
 // Database and repo
 builder.Services.AddTransient<MySqlDbContext>();
 builder.Services.AddTransient<IUserRepo, UserRepo>();
-builder.Services.AddTransient<IDeviceRepo, UserDeviceRepo>();
+builder.Services.AddTransient<IDeviceRepo, DeviceRepo>();
 
 // Domain Specific Services
 builder.Services.AddSingleton<IDeviceFactory, DeviceFactoryService>();

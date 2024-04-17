@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace H6_WiseWatt_Backend.MySqlData
 {
-    public class UserDeviceRepo : IDeviceRepo
+    public class DeviceRepo : IDeviceRepo
     {
         private readonly MySqlDbContext _dbContext;
 
-        public UserDeviceRepo(MySqlDbContext dbContext)
+        public DeviceRepo(MySqlDbContext dbContext)
         {
             _dbContext = dbContext;
         }
