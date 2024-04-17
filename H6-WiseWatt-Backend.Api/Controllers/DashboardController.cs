@@ -148,13 +148,13 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 }
 
                 var deviceEntities = await GetCurrentUserDevices(userGuid);
-                var data = _deviceConsumptionService.GetSummaryOfDailyConsumption(deviceEntities);
+                var data = await _deviceConsumptionService.GetSummaryOfDailyConsumption(deviceEntities);
 
                 var formattedItems = data.Select(i => new
                 {
                     Name = i.Item1, 
                     CurrentConsumption = Math.Round(i.Item2, 2),
-                    TotalConsumption = Math.Round(i.Item3, 2)
+                    Cost = Math.Round(i.Item3, 2)
                 }).ToList();
 
                 return Ok(formattedItems);

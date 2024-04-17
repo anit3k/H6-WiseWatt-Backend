@@ -20,13 +20,14 @@ namespace H6_WiseWatt_Backend.MySqlData
             {
                 return new List<ElectricityPriceEntity>();
             }
-            var result = priceModels.Select( pm => MapToPriceEntity(pm)).ToList();
+            var result = priceModels.Select(pm => MapToPriceEntity(pm)).ToList();
             return result;
-        }       
+        }
 
-        public Task<ElectricityPriceEntity> GetPrice(DateTime timeStamp)
+        public async Task<ElectricityPriceEntity> GetPrice(DateTime timeStamp)
         {
-            throw new NotImplementedException();
+            var price = await _dbContext.ElectricityPrices.Where(ts => ts.TimeStamp == timeStamp).FirstOrDefaultAsync();
+            return MapToPriceEntity(price);
         }
 
         public async Task UpdatePrices(List<ElectricityPriceEntity> priceUpdate)
