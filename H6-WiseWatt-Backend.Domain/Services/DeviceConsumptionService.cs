@@ -5,17 +5,17 @@ namespace H6_WiseWatt_Backend.Domain.Services
 {
     public class DeviceConsumptionService : IDeviceConsumptionService
     {
-        public Dictionary<string, double> GetSummaryOfDailyConsumption(List<IoTDeviceBaseEntity> devices)
+        public List<Tuple<string, double, double>> GetSummaryOfDailyConsumption(List<IoTDeviceBaseEntity> devices)
         {
-            var result = new Dictionary<string, double>();
+            var result = new List<Tuple<string, double, double>>();
             double totalConsumption = 0;
             foreach (var device in devices)
             {
                 var dailyUsage = CalculateDailyUsage(device);
-                result.Add(device.DeviceName, dailyUsage);
+                result.Add(new Tuple<string, double, double>(device.DeviceName, dailyUsage, dailyUsage * 2));
                 totalConsumption += dailyUsage;
             }
-            result.Add("Total", totalConsumption);
+            result.Add(new Tuple<string, double, double>("Total", totalConsumption, totalConsumption * 2));
             return result;
         }
 
