@@ -1,34 +1,55 @@
-﻿using H6_WiseWatt_Backend.Domain.Entities;
-using H6_WiseWatt_Backend.Domain.Entities.IotEntities;
+﻿using H6_WiseWatt_Backend.Domain.Entities.IotEntities;
 using H6_WiseWatt_Backend.Domain.Interfaces;
 
 namespace H6_WiseWatt_Backend.Domain.Services
 {
     public class DeviceConsumptionService : IDeviceConsumptionService
     {
-        public ConsumptionStatisticsEntity CalculateStatistics(List<IoTDeviceBaseEntity> devices)
+        public Dictionary<string, double> GetSummaryOfDailyConsumption(List<IoTDeviceBaseEntity> devices)
         {
-            var statistics = new ConsumptionStatisticsEntity();
+            var result = new Dictionary<string, double>();
+            double totalConsumption = 0;
+            foreach (var device in devices)
+            {
+                var dailyUsage = CalculateDailyUsage(device);
+                result.Add(device.DeviceName, dailyUsage);
+                totalConsumption += dailyUsage;
+            }
+            result.Add("Total", totalConsumption);
+            return result;
+        }
+
+        public Dictionary<string, double> GetDailyPercentageByDevice(List<IoTDeviceBaseEntity> devices)
+        {
+            var result = new Dictionary<string, double>();
+            var dailyConsumption = new Dictionary<string, double>();
             double totalConsumption = 0;
 
             foreach (var device in devices)
             {
                 var dailyUsage = CalculateDailyUsage(device);
-                statistics.DailyConsumptionByDevice.Add(device.DeviceName, dailyUsage);
+                dailyConsumption.Add(device.DeviceName, dailyUsage);
                 totalConsumption += dailyUsage;
-
-                var hourlyUsage = CalculateHourlyUsage(device);
-                statistics.HourlyConsumptionByDevice.Add(device.DeviceName, hourlyUsage);
             }
 
-            statistics.TotalDailyConsumption = totalConsumption;
-            foreach (var device in statistics.DailyConsumptionByDevice)
+            foreach (var device in dailyConsumption)
             {
                 double percentage = (device.Value / totalConsumption) * 100;
-                statistics.DailyPercentageByDevice.Add(device.Key, percentage);
+                result.Add(device.Key, percentage);
             }
 
-            return statistics;
+            return result;
+        }
+
+        public Dictionary<string, List<double>> GetHourlyConsumptionByDevice(List<IoTDeviceBaseEntity> devices)
+        {
+            var result = new Dictionary<string, List<double>>();
+            foreach (var device in devices)
+            {
+                var hourlyUsage = CalculateHourlyUsage(device);
+                result.Add(device.DeviceName, hourlyUsage);
+            }
+            return result;
         }
 
         private double CalculateDailyUsage(IoTDeviceBaseEntity device)

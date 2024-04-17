@@ -6,6 +6,7 @@
         public  string DeviceType { get; set; }
         public string DeviceName { get; set; }
         public string Serial { get; set; }
+        public bool IsManuallyOperated { get; set; }
         public bool IsOn { get; set; }
         public double EnergyConsumption { get; set; }
         public TimeSpan OnTime { get; set; }

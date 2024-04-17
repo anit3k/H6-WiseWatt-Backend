@@ -11,12 +11,12 @@ namespace H6_WiseWatt_Backend.Api.Controllers
     [ApiController]
     public class DashboardController : ControllerBase
     {
-        private readonly IDeviceRepo _userDeviceRepo;
+        private readonly IDeviceService _deviceService;
         private readonly IDeviceConsumptionService _deviceConsumptionService;
 
-        public DashboardController(IDeviceRepo userDeviceRepo, IDeviceConsumptionService deviceConsumptionService)
+        public DashboardController(IDeviceService deviceService, IDeviceConsumptionService deviceConsumptionService)
         {
-            _userDeviceRepo = userDeviceRepo;
+            _deviceService = deviceService;
             _deviceConsumptionService = deviceConsumptionService;
         }
 
@@ -34,8 +34,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 }
 
                 var deviceEntities = await GetCurrentUserDevices(userGuid);
-                var response = GetResponseDto(deviceEntities);
-                return Ok(response);
+                return Ok(deviceEntities.Select(dm => MapToDeviceDto(dm)).ToList());
             }
             catch (Exception ex)
             {
@@ -43,24 +42,6 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
             }
         }
-
-        private DashboardDto GetResponseDto(List<IoTDeviceBaseEntity> deviceEntities)
-        {
-            var stats = _deviceConsumptionService.CalculateStatistics(deviceEntities);
-            var result = new DashboardDto
-            {
-                Stats = new Statistics
-                {
-                    DailyPercentageByDevice = stats.DailyPercentageByDevice,
-                    DailyConsumptionByDevice = stats.DailyConsumptionByDevice,
-                    HourlyConsumptionByDevice = stats.HourlyConsumptionByDevice,
-                    TotalDailyConsumption = stats.TotalDailyConsumption
-                },
-                Devices = deviceEntities.Select(dm => MapToDeviceDto(dm)).ToList()
-            };
-            return result;
-        }
-
         #endregion
 
         #region Update Device
@@ -77,7 +58,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 }
                 var deviceEntity = MapToDeviceEntity(device);
 
-                await _userDeviceRepo.UpdateDevice(deviceEntity);
+                await _deviceService.UpdateDevice(deviceEntity);
                 return Ok("Device Updated");
             }
             catch (Exception ex)
@@ -88,6 +69,85 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         }
         #endregion
 
+        #region Get Daily Percentage
+        [HttpGet]
+        [Route("api/dashboard/daily-percentage")]
+        public async Task<IActionResult> GetPercentage()
+        {
+            try
+            {
+                var userGuid = GetUserGuidFromToken();
+                if (ValidateUser(userGuid))
+                {
+                    return BadRequest("Invalid User");
+                }
+
+                var deviceEntities = await GetCurrentUserDevices(userGuid);
+
+                var result = _deviceConsumptionService.GetDailyPercentageByDevice(deviceEntities);
+                var formattedResponse = result.Select(kvp => new PercentageDTO
+                {
+                    Value = Math.Round(kvp.Value, 2),
+                    Name = kvp.Key
+                }).ToList();
+
+                return Ok(formattedResponse);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"An error has occurred with error message: {ex.Message}");
+                return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
+            }
+        }
+        #endregion
+
+        #region Get Hourly Consumption
+        [HttpGet]
+        [Route("api/dashboard/hourly-consumption")]
+        public async Task<IActionResult> GetHourlyConsumption()
+        {
+            try
+            {
+                var userGuid = GetUserGuidFromToken();
+                if (ValidateUser(userGuid))
+                {
+                    return BadRequest("Invalid User");
+                }
+
+                var deviceEntities = await GetCurrentUserDevices(userGuid);
+                return Ok(_deviceConsumptionService.GetHourlyConsumptionByDevice(deviceEntities));
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"An error has occurred with error message: {ex.Message}");
+                return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
+            }
+        }
+        #endregion
+
+        #region Get Summary Daily Consumption
+        [HttpGet]
+        [Route("api/dashboard/daily-summary")]
+        public async Task<IActionResult> GetSummaryDailyConsumption()
+        {
+            try
+            {
+                var userGuid = GetUserGuidFromToken();
+                if (ValidateUser(userGuid))
+                {
+                    return BadRequest("Invalid User");
+                }
+
+                var deviceEntities = await GetCurrentUserDevices(userGuid);
+                return Ok(_deviceConsumptionService.GetSummaryOfDailyConsumption(deviceEntities));
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"An error has occurred with error message: {ex.Message}");
+                return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
+            }
+        }
+        #endregion
 
         private string? GetUserGuidFromToken()
         {
@@ -101,7 +161,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         private async Task<List<IoTDeviceBaseEntity>> GetCurrentUserDevices(string? userId)
         {
             Log.Information($"User {userId} request a list of all devices");
-            var result = await _userDeviceRepo.GetDevices(userId);
+            var result = await _deviceService.GetDevices(userId);
             return result;
         }
 
@@ -113,10 +173,11 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 DeviceType = entity.DeviceType.ToString(),
                 DeviceName = entity.DeviceName,
                 Serial = entity.Serial,
-                IsOn = entity.IsOn,
+                IsManuallyOperated = entity.IsManuallyOperated,
                 EnergyConsumption = entity.EnergyConsumption,
                 OnTime = entity.OnTime,
                 OffTime = entity.OffTime,
+                IsOn = entity.IsOn,
                 Degree = null,
             };
 
@@ -140,61 +201,32 @@ namespace H6_WiseWatt_Backend.Api.Controllers
 
         private IoTDeviceBaseEntity MapToDeviceEntity(DeviceDto model)
         {
-            return model.DeviceType switch
+            IoTDeviceBaseEntity entity = model.DeviceType switch
             {
-                "Dishwasher" => new DishwasherEntity
-                {
-                    UserGuid = model.UserGuid,
-                    DeviceName = model.DeviceName,
-                    Serial = model.Serial,
-                    IsOn = model.IsOn,
-                    EnergyConsumption = model.EnergyConsumption,
-                    OnTime = model.OnTime,
-                    OffTime = model.OffTime,
-                },
-                "Dryer" => new DryerEntity
-                {
-                    UserGuid = model.UserGuid,
-                    DeviceName = model.DeviceName,
-                    Serial = model.Serial,
-                    IsOn = model.IsOn,
-                    EnergyConsumption = model.EnergyConsumption,
-                    OnTime = model.OnTime,
-                    OffTime = model.OffTime,
-                },
-                "CarCharger" => new ElectricCarChargerEntity
-                {
-                    UserGuid = model.UserGuid,
-                    DeviceName = model.DeviceName,
-                    Serial = model.Serial,
-                    IsOn = model.IsOn,
-                    EnergyConsumption = model.EnergyConsumption,
-                    OnTime = model.OnTime,
-                    OffTime = model.OffTime
-                },
-                "HeatPump" => new HeatPumpEntity
-                {
-                    UserGuid = model.UserGuid,
-                    DeviceName = model.DeviceName,
-                    Serial = model.Serial,
-                    IsOn = model.IsOn,
-                    EnergyConsumption = model.EnergyConsumption,
-                    OnTime = model.OnTime,
-                    OffTime = model.OffTime,
-                    Degree = (int)model.Degree,
-                },
-                "WashingMachine" => new WashingMachineEntity
-                {
-                    UserGuid = model.UserGuid,
-                    DeviceName = model.DeviceName,
-                    Serial = model.Serial,
-                    IsOn = model.IsOn,
-                    EnergyConsumption = model.EnergyConsumption,
-                    OnTime = model.OnTime,
-                    OffTime = model.OffTime,
-                },
+                "Dishwasher" => new DishwasherEntity(),
+                "Dryer" => new DryerEntity(),
+                "CarCharger" => new ElectricCarChargerEntity(),
+                "HeatPump" => new HeatPumpEntity(),
+                "WashingMachine" => new WashingMachineEntity(),
                 _ => throw new ArgumentException("Unknown device type", nameof(model.DeviceType))
             };
+
+            entity.UserGuid = model.UserGuid;
+            entity.DeviceName = model.DeviceName;
+            entity.Serial = model.Serial;
+            entity.IsManuallyOperated = model.IsManuallyOperated;
+            entity.EnergyConsumption = model.EnergyConsumption;
+            entity.OnTime = model.OnTime;
+            entity.OffTime = model.OffTime;
+            entity.IsOn = model.IsOn;
+
+
+            if (entity is HeatPumpEntity heatPump && model.Degree.HasValue)
+            {
+                heatPump.Degree = model.Degree.Value;
+            }
+
+            return entity;
         }
     }
 }

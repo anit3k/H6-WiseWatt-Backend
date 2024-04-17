@@ -14,6 +14,7 @@ namespace H6_WiseWatt_Backend.MySqlData.Models
 
         public string Serial { get; set; }
 
+        public bool IsManuallyOperated { get; set; }
         public bool IsOn { get; set; }
 
         public double EnergyConsumption { get; set; }

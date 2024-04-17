@@ -1,10 +1,11 @@
 ﻿using H6_WiseWatt_Backend.Domain.Entities.IotEntities;
+using H6_WiseWatt_Backend.Domain.Interfaces;
 
-namespace H6_WiseWatt_Backend.Domain.Factories
+namespace H6_WiseWatt_Backend.Domain.Services
 {
-    public class IoTDeviceFactoryImp : IIoTDeviceFactory
+    public class DeviceFactoryService : IDeviceFactory
     {
-        private readonly Random _random = new Random();        
+        private readonly Random _random = new Random();
 
         public IoTDeviceBaseEntity CreateDevice(string type, string name = null)
         {
@@ -13,17 +14,19 @@ namespace H6_WiseWatt_Backend.Domain.Factories
                 case "Dishwasher":
                     return new DishwasherEntity
                     {
-                        DeviceName = name ?? "Default Dishwasher",
+                        DeviceName = name ?? "Opvaskemaskine",
+                        IsManuallyOperated = false,
                         IsOn = false,
                         EnergyConsumption = GetRandomConsumption(1.5, 0.8),
                         Serial = "Bosch-" + GetRandomString(),
-                        OnTime = new TimeSpan(6, 0, 0),
-                        OffTime = new TimeSpan(9, 0, 0),
+                        OnTime = new TimeSpan(21, 0, 0),
+                        OffTime = new TimeSpan(23, 30, 0),
                     };
                 case "Dryer":
                     return new DryerEntity
                     {
-                        DeviceName = name ?? "Default Dryer",
+                        DeviceName = name ?? "Tørretumbler",
+                        IsManuallyOperated = false,
                         IsOn = false,
                         EnergyConsumption = GetRandomConsumption(4.5, 2.5),
                         Serial = "Mille-" + GetRandomString(),
@@ -33,7 +36,8 @@ namespace H6_WiseWatt_Backend.Domain.Factories
                 case "CarCharger":
                     return new ElectricCarChargerEntity
                     {
-                        DeviceName = name ?? "Default Car Charger",
+                        DeviceName = name ?? "Ladestander",
+                        IsManuallyOperated = false,
                         IsOn = false,
                         EnergyConsumption = GetRandomConsumption(11, 7),
                         Serial = "Clever-" + GetRandomString(),
@@ -43,7 +47,8 @@ namespace H6_WiseWatt_Backend.Domain.Factories
                 case "HeatPump":
                     return new HeatPumpEntity
                     {
-                        DeviceName = name ?? "Default Heat Pump",
+                        DeviceName = name ?? "Varmepumpe",
+                        IsManuallyOperated = false,
                         IsOn = false,
                         EnergyConsumption = GetRandomConsumption(5, 2),
                         Serial = "LG-" + GetRandomString(),
@@ -54,7 +59,8 @@ namespace H6_WiseWatt_Backend.Domain.Factories
                 case "WashingMachine":
                     return new WashingMachineEntity
                     {
-                        DeviceName = name ?? "Default Washing Machine",
+                        DeviceName = name ?? "Vaskemaskine",
+                        IsManuallyOperated = false,
                         IsOn = false,
                         EnergyConsumption = GetRandomConsumption(1.5, 0.5),
                         Serial = "Blomberg-" + GetRandomString(),
@@ -64,7 +70,7 @@ namespace H6_WiseWatt_Backend.Domain.Factories
                 default:
                     throw new ArgumentException("Unknown device type", nameof(type));
             }
-        }        
+        }
 
         public List<IoTDeviceBaseEntity> CreateDefaultDevices()
         {

@@ -1,6 +1,5 @@
 ﻿using H6_WiseWatt_Backend.Api.Models;
 using H6_WiseWatt_Backend.Domain.Entities;
-using H6_WiseWatt_Backend.Domain.Factories;
 using H6_WiseWatt_Backend.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +12,9 @@ namespace H6_WiseWatt_Backend.Api.Controllers
     {
         private readonly IUserRepo _userRepo;
         private readonly IDeviceRepo _deviceRepo;
-        private readonly IIoTDeviceFactory _deviceFactory;
+        private readonly IDeviceFactory _deviceFactory;
 
-        public UserController(IUserRepo userRepo, IDeviceRepo deviceRepo, IIoTDeviceFactory deviceFactory)
+        public UserController(IUserRepo userRepo, IDeviceRepo deviceRepo, IDeviceFactory deviceFactory)
         {
             _userRepo = userRepo;
             _deviceRepo = deviceRepo;

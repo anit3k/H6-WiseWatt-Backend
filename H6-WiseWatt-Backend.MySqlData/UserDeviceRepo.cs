@@ -48,6 +48,7 @@ namespace H6_WiseWatt_Backend.MySqlData
                 deviceModel.DeviceType = result.DeviceType;
                 deviceModel.DeviceName = result.DeviceName;
                 deviceModel.Serial = result.Serial;
+                deviceModel.IsManuallyOperated = result.IsManuallyOperated;
                 deviceModel.IsOn = result.IsOn;
                 deviceModel.EnergyConsumption = result.EnergyConsumption;
                 deviceModel.OnTime = result.OnTime;
@@ -77,6 +78,7 @@ namespace H6_WiseWatt_Backend.MySqlData
                 DeviceType = entity.DeviceType.ToString(),
                 DeviceName = entity.DeviceName,
                 Serial = entity.Serial,
+                IsManuallyOperated = entity.IsManuallyOperated,                
                 IsOn = entity.IsOn,
                 EnergyConsumption = entity.EnergyConsumption,
                 OnTime = entity.OnTime,
@@ -103,61 +105,32 @@ namespace H6_WiseWatt_Backend.MySqlData
 
         private IoTDeviceBaseEntity MapToDeviceEntity(DeviceDbModel model)
         {
-            return model.DeviceType switch
+            IoTDeviceBaseEntity entity = model.DeviceType switch
             {
-                "Dishwasher" => new DishwasherEntity
-                {
-                    UserGuid = model.UserGuid,
-                    DeviceName = model.DeviceName,
-                    Serial = model.Serial,
-                    IsOn = model.IsOn,
-                    EnergyConsumption = model.EnergyConsumption,
-                    OnTime = model.OnTime,
-                    OffTime = model.OffTime,
-                },
-                "Dryer" => new DryerEntity
-                {
-                    UserGuid = model.UserGuid,
-                    DeviceName = model.DeviceName,
-                    Serial = model.Serial,
-                    IsOn = model.IsOn,
-                    EnergyConsumption = model.EnergyConsumption,
-                    OnTime = model.OnTime,
-                    OffTime = model.OffTime,
-                },
-                "CarCharger" => new ElectricCarChargerEntity
-                {
-                    UserGuid = model.UserGuid,
-                    DeviceName = model.DeviceName,
-                    Serial = model.Serial,
-                    IsOn = model.IsOn,
-                    EnergyConsumption = model.EnergyConsumption,
-                    OnTime = model.OnTime,
-                    OffTime = model.OffTime
-                },
-                "HeatPump" => new HeatPumpEntity
-                {
-                    UserGuid = model.UserGuid,
-                    DeviceName = model.DeviceName,
-                    Serial = model.Serial,
-                    IsOn = model.IsOn,
-                    EnergyConsumption = model.EnergyConsumption,
-                    OnTime = model.OnTime,
-                    OffTime = model.OffTime,
-                    Degree = model.Degree,
-                },
-                "WashingMachine" => new WashingMachineEntity
-                {
-                    UserGuid = model.UserGuid,
-                    DeviceName = model.DeviceName,
-                    Serial = model.Serial,
-                    IsOn = model.IsOn,
-                    EnergyConsumption = model.EnergyConsumption,
-                    OnTime = model.OnTime,
-                    OffTime = model.OffTime,
-                },
+                "Dishwasher" => new DishwasherEntity(),
+                "Dryer" => new DryerEntity(),
+                "CarCharger" => new ElectricCarChargerEntity(),
+                "HeatPump" => new HeatPumpEntity(),
+                "WashingMachine" => new WashingMachineEntity(),
                 _ => throw new ArgumentException("Unknown device type", nameof(model.DeviceType))
             };
+
+            entity.UserGuid = model.UserGuid;
+            entity.DeviceName = model.DeviceName;
+            entity.Serial = model.Serial;
+            entity.IsManuallyOperated = model.IsManuallyOperated;
+            entity.EnergyConsumption = model.EnergyConsumption;
+            entity.OnTime = model.OnTime;
+            entity.OffTime = model.OffTime;
+            entity.IsOn = model.IsOn;
+
+            if (entity is HeatPumpEntity heatPump)
+            {
+                heatPump.Degree = model.Degree;
+            }
+
+            return entity;
         }
+
     }
 }

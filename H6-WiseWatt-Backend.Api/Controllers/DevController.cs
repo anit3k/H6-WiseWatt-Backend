@@ -1,5 +1,4 @@
 ﻿using H6_WiseWatt_Backend.Domain.Entities.IotEntities;
-using H6_WiseWatt_Backend.Domain.Factories;
 using H6_WiseWatt_Backend.Domain.Interfaces;
 using H6_WiseWatt_Backend.MySqlData;
 using H6_WiseWatt_Backend.MySqlData.Models;
@@ -12,14 +11,14 @@ namespace H6_WiseWatt_Backend.Api.Controllers
     public class DevController : ControllerBase
     {
         private readonly MySqlDbContext _dbContext;
-        private readonly IIoTDeviceFactory _deviceFactory;
-        private readonly IDeviceRepo _deviceStorageRepo;
+        private readonly IDeviceFactory _deviceFactory;
+        private readonly IDeviceRepo _deviceRepo;
 
-        public DevController(MySqlDbContext dbContext, IIoTDeviceFactory deviceFactory, IDeviceRepo deviceStorageRepo)
+        public DevController(MySqlDbContext dbContext, IDeviceFactory deviceFactory, IDeviceRepo deviceStorageRepo)
         {
             _dbContext = dbContext;
             _deviceFactory = deviceFactory;
-            _deviceStorageRepo = deviceStorageRepo;
+            _deviceRepo = deviceStorageRepo;
         }
 
         /// <summary>
@@ -64,7 +63,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             foreach (var device in devices)
             {
                 device.UserGuid = user.UserGuid;
-                await _deviceStorageRepo.CreateDevice(device);
+                await _deviceRepo.CreateDevice(device);
             }
         }        
     }
