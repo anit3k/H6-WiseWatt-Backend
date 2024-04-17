@@ -26,11 +26,15 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<MySqlDbContext>();
 builder.Services.AddTransient<IUserRepo, UserRepo>();
 builder.Services.AddTransient<IDeviceRepo, DeviceRepo>();
+builder.Services.AddTransient<IElectricityPriceRepo, ElectricityPriceRepo>();
 
 // Domain Specific Services
 builder.Services.AddSingleton<IDeviceFactory, DeviceFactoryService>();
 builder.Services.AddTransient<IDeviceService, DeviceService>();
 builder.Services.AddTransient<IDeviceConsumptionService, DeviceConsumptionService>();
+builder.Services.AddTransient<IElectricPriceService, ElectricPriceService>();
+builder.Services.AddHttpClient();
+
 
 // Authentication service
 builder.Services.AddTransient<IAuthService, AuthService>();

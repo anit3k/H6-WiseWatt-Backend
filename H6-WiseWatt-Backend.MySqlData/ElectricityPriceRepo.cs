@@ -18,7 +18,7 @@ namespace H6_WiseWatt_Backend.MySqlData
             var priceModels = await _dbContext.ElectricityPrices.ToListAsync();
             if (priceModels == null || priceModels.Count == 0)
             {
-                // fetch prices from Andel Energy
+                return new List<ElectricityPriceEntity>();
             }
             var result = priceModels.Select( pm => MapToPriceEntity(pm)).ToList();
             return result;
