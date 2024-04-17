@@ -115,7 +115,15 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 }
 
                 var deviceEntities = await GetCurrentUserDevices(userGuid);
-                return Ok(_deviceConsumptionService.GetHourlyConsumptionByDevice(deviceEntities));
+                var deviceData = _deviceConsumptionService.GetHourlyConsumptionByDevice(deviceEntities);
+
+                var consumptionDtos = deviceData.Select(d => new HourlyConsumptionDto
+                {
+                    Name = d.Key,
+                    Data = d.Value
+                }).ToList();
+
+                return Ok(consumptionDtos);
             }
             catch (Exception ex)
             {

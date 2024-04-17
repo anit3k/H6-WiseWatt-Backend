@@ -2,5 +2,7 @@
 {
     public class HourlyConsumptionDto
     {
+        public string Name { get; set; }
+        public List<double> Data { get; set; }
     }
 }
