@@ -2,6 +2,7 @@
 using H6_WiseWatt_Backend.Domain.Interfaces;
 using System.Globalization;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 
 namespace H6_WiseWatt_Backend.Domain.Services
 {
@@ -42,15 +43,11 @@ namespace H6_WiseWatt_Backend.Domain.Services
                     string line;
                     while ((line = reader.ReadLine()) != null)
                     {
-                        var columns = line.Split(',');
-                        var entity = new ElectricityPriceEntity
+                        var entity = ParseLine(line);
+                        if (entity != null)
                         {
-                            TimeStamp = DateTime.ParseExact(columns[0].Trim('"'), "dd.MM.yyyy - HH:mm", CultureInfo.InvariantCulture),
-                            PricePerKwh = double.Parse(columns[1].Trim('"').Replace(',', '.'), CultureInfo.InvariantCulture),
-                            TransportAndDuties = double.Parse(columns[2].Trim('"').Replace(',', '.'), CultureInfo.InvariantCulture),
-                            TotalPrice = double.Parse(columns[3].Trim('"').Replace(',', '.'), CultureInfo.InvariantCulture)
-                        };
-                        prices.Add(entity);
+                            prices.Add(entity);
+                        }
                     }
 
                     // Update database
@@ -61,6 +58,27 @@ namespace H6_WiseWatt_Backend.Domain.Services
             }
 
             return allPrices;
+        }
+
+        private ElectricityPriceEntity ParseLine(string line)
+        {
+            var matches = Regex.Matches(line, "\"([^\"]*)\"");
+            if (matches.Count == 4)
+            {
+                return new ElectricityPriceEntity
+                {
+                    TimeStamp = DateTime.ParseExact(matches[0].Groups[1].Value, "dd.MM.yyyy - HH:mm", CultureInfo.InvariantCulture),
+                    PricePerKwh = ParseDouble(matches[1].Groups[1].Value),
+                    TransportAndDuties = ParseDouble(matches[2].Groups[1].Value),
+                    TotalPrice = ParseDouble(matches[3].Groups[1].Value)
+                };
+            }
+            throw new FormatException("Line format incorrect, expected 4 columns.");
+        }
+
+        private double ParseDouble(string value)
+        {
+            return double.Parse(value.Replace(',', '.'), CultureInfo.InvariantCulture);
         }
     }    
 }

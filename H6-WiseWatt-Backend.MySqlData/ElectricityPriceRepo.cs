@@ -22,8 +22,29 @@ namespace H6_WiseWatt_Backend.MySqlData
             }
             var result = priceModels.Select( pm => MapToPriceEntity(pm)).ToList();
             return result;
+        }       
+
+        public Task<ElectricityPriceEntity> GetPrice(DateTime timeStamp)
+        {
+            throw new NotImplementedException();
         }
 
+        public async Task UpdatePrices(List<ElectricityPriceEntity> priceUpdate)
+        {
+            var existingTimestamps = await _dbContext.ElectricityPrices
+                                              .Select(e => e.TimeStamp)
+                                              .ToListAsync();
+
+            var newEntries = priceUpdate.Where(pu => !existingTimestamps.Contains(pu.TimeStamp))
+                                        .Select(pu => MapFromPriceEntity(pu))
+                                        .ToList();
+
+            if (newEntries.Any())
+            {
+                _dbContext.ElectricityPrices.AddRange(newEntries);
+                await _dbContext.SaveChangesAsync();
+            }
+        }
         private ElectricityPriceEntity MapToPriceEntity(ElectricityPriceDbModel pm)
         {
             return new ElectricityPriceEntity
@@ -34,15 +55,15 @@ namespace H6_WiseWatt_Backend.MySqlData
                 TotalPrice = pm.TotalPrice,
             };
         }
-
-        public Task<ElectricityPriceEntity> GetPrice(DateTime timeStamp)
+        private ElectricityPriceDbModel MapFromPriceEntity(ElectricityPriceEntity pu)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task UpdatePrices(List<ElectricityPriceEntity> priceUpdate)
-        {
-            throw new NotImplementedException();
+            return new ElectricityPriceDbModel
+            {
+                TimeStamp = pu.TimeStamp,
+                PricePerKwh = pu.PricePerKwh,
+                TransportAndDuties = pu.TransportAndDuties,
+                TotalPrice = pu.TotalPrice,
+            };
         }
     }
 }
