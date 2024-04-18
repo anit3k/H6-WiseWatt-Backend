@@ -109,6 +109,16 @@ namespace H6_WiseWatt_Backend.Domain.Services
                 return hourlyConsumption; // No consumption if times are the same and not manually operated.
             }
 
+            // Device runs for 24 hours if manually operated.
+            if (device.IsManuallyOperated)
+            {
+                for (var i = 0; i < 24; i++)
+                {
+                    hourlyConsumption[i] = device.EnergyConsumption;
+                }
+                return hourlyConsumption;
+            }
+
             int startHour = device.OnTime.Hours;
             int endHour = device.OffTime.Hours;
             if (endHour < startHour) // Over midnight case
