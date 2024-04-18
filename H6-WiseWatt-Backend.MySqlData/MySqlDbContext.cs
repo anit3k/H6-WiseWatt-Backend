@@ -1,5 +1,4 @@
-﻿using H6_WiseWatt_Backend.Domain.Entities.IotEntities;
-using H6_WiseWatt_Backend.MySqlData.Models;
+﻿using H6_WiseWatt_Backend.MySqlData.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
@@ -39,6 +38,7 @@ namespace H6_WiseWatt_Backend.MySqlData
 
             modelBuilder.Entity<UserDbModel>().HasKey(u => u.Id);
             modelBuilder.Entity<DeviceDbModel>().HasKey(u => u.Id);
+            modelBuilder.Entity<ElectricityPriceDbModel>().HasKey(u => u.Id);
 
             modelBuilder.Entity<DeviceDbModel>().Property(e => e.DeviceType).HasConversion<string>();
             // Apply the converter to the OnTime and OffTime properties
@@ -58,6 +58,7 @@ namespace H6_WiseWatt_Backend.MySqlData
         #region Properties
         public DbSet<UserDbModel> Users { get; set; }
         public DbSet<DeviceDbModel> Devices { get; set; }
+        public DbSet<ElectricityPriceDbModel> ElectricityPrices { get; set; }
         #endregion
     }
 }

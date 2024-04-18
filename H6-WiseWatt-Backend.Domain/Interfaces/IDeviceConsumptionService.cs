@@ -6,6 +6,6 @@ namespace H6_WiseWatt_Backend.Domain.Interfaces
     {
         Dictionary<string, double> GetDailyPercentageByDevice(List<IoTDeviceBaseEntity> devices);
         Dictionary<string, List<double>> GetHourlyConsumptionByDevice(List<IoTDeviceBaseEntity> devices);
-        Dictionary<string, double> GetSummaryOfDailyConsumption(List<IoTDeviceBaseEntity> devices);
+        Task<List<Tuple<string, double, double>>> GetSummaryOfDailyConsumption(List<IoTDeviceBaseEntity> devices);
     }
 }

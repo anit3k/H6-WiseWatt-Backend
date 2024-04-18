@@ -13,12 +13,14 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         private readonly MySqlDbContext _dbContext;
         private readonly IDeviceFactory _deviceFactory;
         private readonly IDeviceRepo _deviceRepo;
+        private readonly IElectricPriceService _priceService;
 
-        public DevController(MySqlDbContext dbContext, IDeviceFactory deviceFactory, IDeviceRepo deviceStorageRepo)
+        public DevController(MySqlDbContext dbContext, IDeviceFactory deviceFactory, IDeviceRepo deviceStorageRepo, IElectricPriceService priceService)
         {
             _dbContext = dbContext;
             _deviceFactory = deviceFactory;
             _deviceRepo = deviceStorageRepo;
+            _priceService = priceService;
         }
 
         /// <summary>
@@ -35,6 +37,8 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 await _dbContext.Database.EnsureCreatedAsync();
                 _dbContext.ChangeTracker.Clear();
                 await AddDefaultTestData2();
+                 var temp = await _priceService.GetElectricityPricesAsync();
+
                 Log.Information("The Database has been reset");
                 return Ok("Db has been reset");
             }

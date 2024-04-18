@@ -4,6 +4,7 @@ using H6_WiseWatt_Backend.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using System.Diagnostics;
 
 namespace H6_WiseWatt_Backend.Api.Controllers
 {
@@ -13,11 +14,13 @@ namespace H6_WiseWatt_Backend.Api.Controllers
     {
         private readonly IDeviceService _deviceService;
         private readonly IDeviceConsumptionService _deviceConsumptionService;
+        private readonly IElectricPriceService _electricPriceService;
 
-        public DashboardController(IDeviceService deviceService, IDeviceConsumptionService deviceConsumptionService)
+        public DashboardController(IDeviceService deviceService, IDeviceConsumptionService deviceConsumptionService, IElectricPriceService electricPriceService)
         {
             _deviceService = deviceService;
             _deviceConsumptionService = deviceConsumptionService;
+            _electricPriceService = electricPriceService;
         }
 
         #region GetAllUsersDevices
@@ -47,7 +50,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         #region Update Device
         [HttpPost]
         [Route("api/dashboard/updateDevice")]
-        public async Task<IActionResult> UpdateDevice(DeviceDto device)
+        public async Task<IActionResult> UpdateDevice(DeviceDTO device)
         {
             try
             {
@@ -117,7 +120,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 var deviceEntities = await GetCurrentUserDevices(userGuid);
                 var deviceData = _deviceConsumptionService.GetHourlyConsumptionByDevice(deviceEntities);
 
-                var consumptionDtos = deviceData.Select(d => new HourlyConsumptionDto
+                var consumptionDtos = deviceData.Select(d => new HourlyConsumptionDTO
                 {
                     Name = d.Key,
                     Data = d.Value.Select(x => Math.Round(x, 2)).ToList()
@@ -148,7 +151,52 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 }
 
                 var deviceEntities = await GetCurrentUserDevices(userGuid);
-                return Ok(_deviceConsumptionService.GetSummaryOfDailyConsumption(deviceEntities));
+                var data = await _deviceConsumptionService.GetSummaryOfDailyConsumption(deviceEntities);
+
+                var formattedItems = data.Select(i => new
+                {
+                    Name = i.Item1, 
+                    CurrentConsumption = Math.Round(i.Item2, 2),
+                    Cost = Math.Round(i.Item3, 2)
+                }).ToList();
+
+                return Ok(formattedItems);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"An error has occurred with error message: {ex.Message}");
+                return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
+            }
+        }
+        #endregion
+
+        #region Get Electricity Prices
+        [HttpGet]
+        [Route("api/dashboard/prices")]
+        public async Task<IActionResult> GetElectrivPrices()
+        {
+            try
+            {
+                var userGuid = GetUserGuidFromToken();
+                if (ValidateUser(userGuid))
+                {
+                    return BadRequest("Invalid User");
+                }
+
+                var deviceEntities = await GetCurrentUserDevices(userGuid);
+                var prices = await _electricPriceService.GetElectricityPricesAsync();
+                var today = DateTime.Today;
+                var filteredPrices = prices.Where(p => p.TimeStamp.Date >= today)
+                                   .OrderBy(p => p.TimeStamp)
+                                   .Select(p => new ElectricityPriceDTO
+                                   {
+                                       TimeStamp = p.TimeStamp,
+                                       PricePerKwh = p.PricePerKwh,
+                                       TransportAndDuties = p.TransportAndDuties,
+                                       TotalPrice = p.TotalPrice
+                                   }).ToList();
+
+                return Ok(filteredPrices);
             }
             catch (Exception ex)
             {
@@ -174,9 +222,9 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             return result;
         }
 
-        private DeviceDto MapToDeviceDto(IoTDeviceBaseEntity entity)
+        private DeviceDTO MapToDeviceDto(IoTDeviceBaseEntity entity)
         {
-            var model = new DeviceDto
+            var model = new DeviceDTO
             {
                 UserGuid = entity.UserGuid,
                 DeviceType = entity.DeviceType.ToString(),
@@ -208,7 +256,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             return model;
         }
 
-        private IoTDeviceBaseEntity MapToDeviceEntity(DeviceDto model)
+        private IoTDeviceBaseEntity MapToDeviceEntity(DeviceDTO model)
         {
             IoTDeviceBaseEntity entity = model.DeviceType switch
             {
