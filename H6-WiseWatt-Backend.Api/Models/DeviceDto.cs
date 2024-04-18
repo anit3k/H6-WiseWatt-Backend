@@ -1,6 +1,6 @@
 ﻿namespace H6_WiseWatt_Backend.Api.Models
 {
-    public class DeviceDto
+    public class DeviceDTO
     {
         public string UserGuid { get; set; }
         public  string DeviceType { get; set; }

@@ -21,7 +21,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
 
         [HttpPost]
         [Route("api/auth/login")]
-        public async Task<IActionResult> Login(LoginDto user)
+        public async Task<IActionResult> Login(LoginDTO user)
         {
             try
             {
@@ -47,12 +47,12 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             }
         }       
 
-        private bool IsNotValid(LoginDto user)
+        private bool IsNotValid(LoginDTO user)
         {
             return user == null || string.IsNullOrWhiteSpace(user.Email) || string.IsNullOrWhiteSpace(user.Password);
         }
 
-        private async Task<UserEntity> GetUserFromDb(LoginDto user)
+        private async Task<UserEntity> GetUserFromDb(LoginDTO user)
         {
             return await _userRepo.GetUser(new UserEntity { Email = user.Email, Password = user.Password });
         }

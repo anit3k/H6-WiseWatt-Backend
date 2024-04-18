@@ -23,7 +23,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
 
         [HttpPost]
         [Route("api/user/register")]
-        public async Task<IActionResult> RegisterUser(UserDto user)
+        public async Task<IActionResult> RegisterUser(UserDTO user)
         {
             try
             {
@@ -55,18 +55,18 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             }
         }
 
-        private bool IsNotValid(UserDto user)
+        private bool IsNotValid(UserDTO user)
         {
             return user == null || string.IsNullOrWhiteSpace(user.Firstname) && string.IsNullOrWhiteSpace(user.Password) && string.IsNullOrWhiteSpace(user.Email);
         }
 
-        private async Task<bool> DoUserExist(UserDto user)
+        private async Task<bool> DoUserExist(UserDTO user)
         {
             var result = await _userRepo.ValidateUserEmail(new UserEntity { Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email });
             return result;
         }
 
-        private async Task<string> AddNewUserToRepo(UserDto user)
+        private async Task<string> AddNewUserToRepo(UserDTO user)
         {
             return await _userRepo.CreateNewUser(new UserEntity { Password = user.Password, Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email, UserGuid = "669cadd0-70cf-43a1-9a9d-426212185666" });
         }
