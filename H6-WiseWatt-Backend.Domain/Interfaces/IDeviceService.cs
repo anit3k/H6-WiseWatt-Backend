@@ -6,6 +6,7 @@ namespace H6_WiseWatt_Backend.Domain.Interfaces
     {
         Task<List<IoTDeviceBaseEntity>> GetDevices(string userGuid);
         Task UpdateDevice(IoTDeviceBaseEntity device);
+        Task<IoTDeviceBaseEntity> GetDevice(string serialNo);
 
     }
 }

@@ -11,6 +11,14 @@ namespace H6_WiseWatt_Backend.Domain.Services
         {
             _deviceRepo = deviceRepo;
         }
+
+        public async Task<IoTDeviceBaseEntity> GetDevice(string serialNo)
+        {
+            var device = await _deviceRepo.GetDevice(serialNo);
+            UpdateOnStatus(device, DateTime.Now.TimeOfDay);
+            return device;
+        }
+
         public async Task<List<IoTDeviceBaseEntity>> GetDevices(string userGuid)
         {
             var devices = await _deviceRepo.GetDevices(userGuid);
@@ -24,7 +32,7 @@ namespace H6_WiseWatt_Backend.Domain.Services
         public async Task UpdateDevice(IoTDeviceBaseEntity device)
         {
             UpdateOnStatus(device, DateTime.Now.TimeOfDay);
-            await _deviceRepo.UpdateDevice(device);            
+            await _deviceRepo.UpdateDevice(device);
         }
 
         private void UpdateOnStatus(IoTDeviceBaseEntity device, TimeSpan currentTime)
@@ -44,6 +52,6 @@ namespace H6_WiseWatt_Backend.Domain.Services
                     device.IsOn = (currentTime >= device.OnTime || currentTime <= device.OffTime); // Over midnight case
                 }
             }
-        }        
+        }
     }
 }
