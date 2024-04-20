@@ -1,6 +1,7 @@
 ﻿using H6_WiseWatt_Backend.Domain.Entities;
 using H6_WiseWatt_Backend.Domain.Interfaces;
 using H6_WiseWatt_Backend.MySqlData.Models;
+using H6_WiseWatt_Backend.Security.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace H6_WiseWatt_Backend.MySqlData
@@ -8,15 +9,19 @@ namespace H6_WiseWatt_Backend.MySqlData
     public class UserRepo : IUserRepo
     {
         private readonly MySqlDbContext _dbContext;
+        private readonly IPasswordService _passwordService;
 
-        public UserRepo(MySqlDbContext dbContext)
+        public UserRepo(MySqlDbContext dbContext, IPasswordService passwordService)
         {
             _dbContext = dbContext;
+            _passwordService = passwordService;
         }
 
         public async Task<string> CreateNewUser(UserEntity user)
         {
-            var dbUser = new UserDbModel { Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email, Password = user.Password, UserGuid = Guid.NewGuid().ToString() };
+            var salt = _passwordService.GenerateSalt();
+            var passwordHash = _passwordService.HashPasswordWithSalt(user.Password, salt);
+            var dbUser = new UserDbModel { Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email, PasswordHash = passwordHash, Salt = salt, UserGuid = Guid.NewGuid().ToString() };
             _dbContext.Users.Add(dbUser);
             var result = await _dbContext.SaveChangesAsync();
             if (result == 1)
@@ -36,7 +41,7 @@ namespace H6_WiseWatt_Backend.MySqlData
 
         public async Task<UserEntity?> GetUser(UserEntity user)
         {
-            var dbUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == user.Email && u.Password == user.Password);
+            var dbUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
             if (dbUser == null) { return null; }
             return new UserEntity()
             {
