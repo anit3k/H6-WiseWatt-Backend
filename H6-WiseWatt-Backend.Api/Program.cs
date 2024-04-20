@@ -37,8 +37,8 @@ builder.Services.AddHttpClient();
 
 
 // Security services
-builder.Services.AddTransient<IAuthService, AuthService>();
-builder.Services.AddTransient<IPasswordService, PasswordService>();
+builder.Services.AddTransient<ITokenGenerator, TokenGenerator>();
+builder.Services.AddTransient<IPasswordHasher, PasswordHasher>();
 // Authentication schema
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -52,7 +52,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = true,
             ValidIssuer = tokenSettings.TokenIssuer,
             ValidateAudience = true,
-            ValidAudience = tokenSettings.TokenAudience
+            ValidAudience = tokenSettings.TokenAudience,
+            ValidateLifetime = true,
         };
     });
 

@@ -1,7 +1,6 @@
 ﻿using H6_WiseWatt_Backend.Api.Models;
 using H6_WiseWatt_Backend.Domain.Entities;
 using H6_WiseWatt_Backend.Domain.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 

@@ -12,12 +12,12 @@ namespace H6_WiseWatt_Backend.Api.Controllers
     public class DevController : ControllerBase
     {
         private readonly MySqlDbContext _dbContext;
-        private readonly IPasswordService _passwordService;
+        private readonly IPasswordHasher _passwordService;
         private readonly IDeviceFactory _deviceFactory;
         private readonly IDeviceRepo _deviceRepo;
         private readonly IElectricPriceService _priceService;
 
-        public DevController(MySqlDbContext dbContext,IPasswordService passwordService, IDeviceFactory deviceFactory, IDeviceRepo deviceStorageRepo, IElectricPriceService priceService)
+        public DevController(MySqlDbContext dbContext,IPasswordHasher passwordService, IDeviceFactory deviceFactory, IDeviceRepo deviceStorageRepo, IElectricPriceService priceService)
         {
             _dbContext = dbContext;
             _passwordService = passwordService;

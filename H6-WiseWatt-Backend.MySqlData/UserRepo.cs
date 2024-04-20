@@ -9,9 +9,9 @@ namespace H6_WiseWatt_Backend.MySqlData
     public class UserRepo : IUserRepo
     {
         private readonly MySqlDbContext _dbContext;
-        private readonly IPasswordService _passwordService;
+        private readonly IPasswordHasher _passwordService;
 
-        public UserRepo(MySqlDbContext dbContext, IPasswordService passwordService)
+        public UserRepo(MySqlDbContext dbContext, IPasswordHasher passwordService)
         {
             _dbContext = dbContext;
             _passwordService = passwordService;

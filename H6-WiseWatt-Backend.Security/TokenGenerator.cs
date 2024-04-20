@@ -8,10 +8,10 @@ using System.Security.Claims;
 
 namespace H6_WiseWatt_Backend.Security
 {
-    public class AuthService : IAuthService
+    public class TokenGenerator : ITokenGenerator
     {
         private readonly IConfiguration _config;
-        public AuthService(IConfiguration config)
+        public TokenGenerator(IConfiguration config)
         {
             _config = config;
         }

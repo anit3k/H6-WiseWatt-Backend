@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 
 namespace H6_WiseWatt_Backend.Security
 {
-    public class PasswordService : IPasswordService
+    public class PasswordHasher : IPasswordHasher
     {
         public string GenerateSalt()
         {

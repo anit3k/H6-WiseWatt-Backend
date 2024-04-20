@@ -4,7 +4,6 @@ using H6_WiseWatt_Backend.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using System.Diagnostics;
 
 namespace H6_WiseWatt_Backend.Api.Controllers
 {

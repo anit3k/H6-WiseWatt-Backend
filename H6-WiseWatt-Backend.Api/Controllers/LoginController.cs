@@ -11,9 +11,9 @@ namespace H6_WiseWatt_Backend.Api.Controllers
     public class LoginController : ControllerBase
     {
         private readonly IUserRepo _userRepo;
-        private readonly IAuthService _authService;
+        private readonly ITokenGenerator _authService;
 
-        public LoginController(IUserRepo userRepo, IAuthService authService)
+        public LoginController(IUserRepo userRepo, ITokenGenerator authService)
         {
             _userRepo = userRepo;
             _authService = authService;

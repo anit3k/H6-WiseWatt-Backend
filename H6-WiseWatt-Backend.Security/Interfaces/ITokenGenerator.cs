@@ -2,7 +2,7 @@
 
 namespace H6_WiseWatt_Backend.Security.Interfaces
 {
-    public interface IAuthService
+    public interface ITokenGenerator
     {
         string GenerateJSonWebToken(UserEntity user);
     }
