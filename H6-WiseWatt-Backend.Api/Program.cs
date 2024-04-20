@@ -36,8 +36,9 @@ builder.Services.AddTransient<IElectricPriceService, ElectricPriceService>();
 builder.Services.AddHttpClient();
 
 
-// Authentication service
+// Security services
 builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddTransient<IPasswordService, PasswordService>();
 // Authentication schema
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

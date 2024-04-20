@@ -54,7 +54,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
 
         private async Task<UserEntity> GetUserFromDb(LoginDTO user)
         {
-            return await _userRepo.GetUser(new UserEntity { Email = user.Email, Password = user.Password });
+            return await _userRepo.GetUser(new UserEntity { Email = user.Email });
         }
 
         private bool IsUserNull(UserEntity existingUser)
