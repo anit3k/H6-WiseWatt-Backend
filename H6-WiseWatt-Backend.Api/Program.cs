@@ -19,6 +19,7 @@ Log.Logger = new LoggerConfiguration()
             .CreateLogger();
 
 builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // API Dependecy Injections
@@ -32,9 +33,10 @@ builder.Services.AddTransient<IDeviceRepo, DeviceRepo>();
 builder.Services.AddTransient<IElectricityPriceRepo, ElectricityPriceRepo>();
 
 // Domain Specific Services
+builder.Services.AddTransient<IUserManager, UserManager>();
 builder.Services.AddSingleton<IDeviceFactory, DeviceFactoryService>();
-builder.Services.AddTransient<IDeviceService, DeviceService>();
-builder.Services.AddTransient<IDeviceConsumptionService, DeviceConsumptionService>();
+builder.Services.AddTransient<IDeviceManager, DeviceManager>();
+builder.Services.AddTransient<IConsumptionCalculator, ConsumptionCalculator>();
 builder.Services.AddTransient<IElectricPriceService, ElectricPriceService>();
 builder.Services.AddHttpClient();
 

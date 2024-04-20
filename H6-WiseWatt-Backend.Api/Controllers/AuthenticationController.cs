@@ -10,12 +10,12 @@ namespace H6_WiseWatt_Backend.Api.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        private readonly IUserRepo _userRepo;
+        private readonly IUserManager _userManager;
         private readonly ITokenGenerator _tokenGen;
 
-        public AuthenticationController(IUserRepo userRepo, ITokenGenerator tokenGen)
+        public AuthenticationController(IUserManager userManager, ITokenGenerator tokenGen)
         {
-            _userRepo = userRepo;
+            _userManager = userManager;
             _tokenGen = tokenGen;
         }
 
@@ -54,7 +54,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
 
         private async Task<UserEntity> GetUserFromDb(LoginDTO user)
         {
-            return await _userRepo.GetUser(new UserEntity { Email = user.Email });
+            return await _userManager.GetUser(new UserEntity { Email = user.Email });
         }
 
         private bool IsUserNull(UserEntity existingUser)

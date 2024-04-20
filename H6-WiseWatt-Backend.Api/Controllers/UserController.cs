@@ -9,15 +9,11 @@ namespace H6_WiseWatt_Backend.Api.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepo _userRepo;
-        private readonly IDeviceRepo _deviceRepo;
-        private readonly IDeviceFactory _deviceFactory;
+        private readonly IUserManager _userManager;
 
-        public UserController(IUserRepo userRepo, IDeviceRepo deviceRepo, IDeviceFactory deviceFactory)
+        public UserController(IUserManager userManager)
         {
-            _userRepo = userRepo;
-            _deviceRepo = deviceRepo;
-            _deviceFactory = deviceFactory;
+            _userManager = userManager;
         }
 
         [HttpPost]
@@ -36,10 +32,8 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                     return BadRequest("User already exist");
                 }
 
-                string userGuid = await AddNewUserToRepo(user);
-                if (IsUserGuidValid(userGuid))
+                if (await AddNewUserToRepo(user))
                 {
-                    await CreateDefaultDevicesToNewUser(userGuid);
                     return Ok("User has been created");
                 }
                 else
@@ -61,29 +55,13 @@ namespace H6_WiseWatt_Backend.Api.Controllers
 
         private async Task<bool> DoUserExist(UserDTO user)
         {
-            var result = await _userRepo.ValidateUserEmail(new UserEntity { Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email });
+            var result = await _userManager.ValidateUserByEmail(user.Email);
             return result;
         }
 
-        private async Task<string> AddNewUserToRepo(UserDTO user)
+        private async Task<bool> AddNewUserToRepo(UserDTO user)
         {
-            return await _userRepo.CreateNewUser(new UserEntity { Password = user.Password, Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email, UserGuid = "669cadd0-70cf-43a1-9a9d-426212185666" });
+            return await _userManager.CreateNewUser(new UserEntity { Password = user.Password, Firstname = user.Firstname, Lastname = user.Lastname, Email = user.Email });
         }
-
-        private bool IsUserGuidValid(string userGuid)
-        {
-            return userGuid != string.Empty;
-        }        
-
-        private async Task CreateDefaultDevicesToNewUser(string userGuid)
-        {
-            var devices = _deviceFactory.CreateDefaultDevices();
-
-            foreach (var device in devices)
-            {
-                device.UserGuid = userGuid;
-                await _deviceRepo.CreateDevice(device);
-            }
-        }       
     }
 }

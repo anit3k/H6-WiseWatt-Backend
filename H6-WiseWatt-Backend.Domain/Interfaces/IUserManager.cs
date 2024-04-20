@@ -2,10 +2,10 @@
 
 namespace H6_WiseWatt_Backend.Domain.Interfaces
 {
-    public interface IUserRepo
+    public interface IUserManager
     {
-        Task<string> CreateNewUser(UserEntity user);
+        Task<bool> ValidateUserByEmail(string email);
+        Task<bool> CreateNewUser(UserEntity user);
         Task<UserEntity> GetUser(UserEntity user);
-        Task<bool> ValidateUserEmail(string email);
     }
 }

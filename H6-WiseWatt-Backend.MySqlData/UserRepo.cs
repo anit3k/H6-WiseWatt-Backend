@@ -34,9 +34,9 @@ namespace H6_WiseWatt_Backend.MySqlData
             }
         }
 
-        public async Task<bool> ValidateUserEmail(UserEntity user)
+        public async Task<bool> ValidateUserEmail(string email)
         {
-            return await _dbContext.Users.AnyAsync(u => u.Email == user.Email);
+            return await _dbContext.Users.AnyAsync(u => u.Email == email);
         }
 
         public async Task<UserEntity?> GetUser(UserEntity user)
