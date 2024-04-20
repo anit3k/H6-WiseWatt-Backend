@@ -8,15 +8,15 @@ using Serilog;
 namespace H6_WiseWatt_Backend.Api.Controllers
 {
     [ApiController]
-    public class LoginController : ControllerBase
+    public class AuthenticationController : ControllerBase
     {
         private readonly IUserRepo _userRepo;
-        private readonly ITokenGenerator _authService;
+        private readonly ITokenGenerator _tokenGen;
 
-        public LoginController(IUserRepo userRepo, ITokenGenerator authService)
+        public AuthenticationController(IUserRepo userRepo, ITokenGenerator tokenGen)
         {
             _userRepo = userRepo;
-            _authService = authService;
+            _tokenGen = tokenGen;
         }
 
         [HttpPost]
@@ -36,7 +36,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                     return BadRequest("Wrong user name or password");
                 }
 
-                var token = _authService.GenerateJSonWebToken(existingUser);
+                var token = _tokenGen.GenerateJSonWebToken(existingUser);
                 Log.Information($"User {user.Email} has logged in");
                 return Ok(token);
             }

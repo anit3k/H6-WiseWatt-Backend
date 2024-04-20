@@ -1,4 +1,5 @@
 ﻿using H6_WiseWatt_Backend.Api.Models;
+using H6_WiseWatt_Backend.Api.Utils;
 using H6_WiseWatt_Backend.Domain.Entities.IotEntities;
 using H6_WiseWatt_Backend.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -14,62 +15,17 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         private readonly IDeviceService _deviceService;
         private readonly IDeviceConsumptionService _deviceConsumptionService;
         private readonly IElectricPriceService _electricPriceService;
+        private readonly AuthenticationUtility _utility;
 
-        public DashboardController(IDeviceService deviceService, IDeviceConsumptionService deviceConsumptionService, IElectricPriceService electricPriceService)
+        public DashboardController(IDeviceService deviceService, IDeviceConsumptionService deviceConsumptionService, IElectricPriceService electricPriceService, AuthenticationUtility utility)
         {
             _deviceService = deviceService;
             _deviceConsumptionService = deviceConsumptionService;
             _electricPriceService = electricPriceService;
+            _utility = utility;
         }
 
-        #region GetAllUsersDevices
-        [HttpGet]
-        [Route("api/dashboard/devices")]
-        public async Task<IActionResult> GetDevices()
-        {
-            try
-            {
-                var userGuid = GetUserGuidFromToken();
-                if (ValidateUser(userGuid))
-                {
-                    return BadRequest("Invalid User");
-                }
-
-                var deviceEntities = await GetCurrentUserDevices(userGuid);
-                return Ok(deviceEntities.Select(dm => MapToDeviceDto(dm)).ToList());
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"An error has occurred with error message: {ex.Message}");
-                return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
-            }
-        }
-        #endregion
-
-        #region Update Device
-        [HttpPost]
-        [Route("api/dashboard/updateDevice")]
-        public async Task<IActionResult> UpdateDevice(DeviceDTO device)
-        {
-            try
-            {
-                var userGuid = GetUserGuidFromToken();
-                if (ValidateUser(userGuid))
-                {
-                    return BadRequest("Invalid User");
-                }
-                var deviceEntity = MapToDeviceEntity(device);
-
-                await _deviceService.UpdateDevice(deviceEntity);
-                return Ok("Device Updated");
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"An error has occurred with error message: {ex.Message}");
-                return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
-            }
-        }
-        #endregion
+        
 
         #region Get Daily Percentage
         [HttpGet]
@@ -78,8 +34,8 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         {
             try
             {
-                var userGuid = GetUserGuidFromToken();
-                if (ValidateUser(userGuid))
+                var userGuid = _utility.GetUserGuidFromToken(User);
+                if (_utility.ValidateUser(userGuid))
                 {
                     return BadRequest("Invalid User");
                 }
@@ -110,8 +66,8 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         {
             try
             {
-                var userGuid = GetUserGuidFromToken();
-                if (ValidateUser(userGuid))
+                var userGuid = _utility.GetUserGuidFromToken(User);
+                if (_utility.ValidateUser(userGuid))
                 {
                     return BadRequest("Invalid User");
                 }
@@ -143,8 +99,8 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         {
             try
             {
-                var userGuid = GetUserGuidFromToken();
-                if (ValidateUser(userGuid))
+                var userGuid = _utility.GetUserGuidFromToken(User);
+                if (_utility.ValidateUser(userGuid))
                 {
                     return BadRequest("Invalid User");
                 }
@@ -176,8 +132,8 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         {
             try
             {
-                var userGuid = GetUserGuidFromToken();
-                if (ValidateUser(userGuid))
+                var userGuid = _utility.GetUserGuidFromToken(User);
+                if (_utility.ValidateUser(userGuid))
                 {
                     return BadRequest("Invalid User");
                 }
@@ -204,85 +160,12 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             }
         }
         #endregion
-
-        private string? GetUserGuidFromToken()
-        {
-            return User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
-        }
-
-        private bool ValidateUser(string? userId)
-        {
-            return userId == null || string.IsNullOrEmpty(userId);
-        }
+       
         private async Task<List<IoTDeviceBaseEntity>> GetCurrentUserDevices(string? userId)
         {
             Log.Information($"User {userId} request a list of all devices");
             var result = await _deviceService.GetDevices(userId);
             return result;
-        }
-
-        private DeviceDTO MapToDeviceDto(IoTDeviceBaseEntity entity)
-        {
-            var model = new DeviceDTO
-            {
-                UserGuid = entity.UserGuid,
-                DeviceType = entity.DeviceType.ToString(),
-                DeviceName = entity.DeviceName,
-                Serial = entity.Serial,
-                IsManuallyOperated = entity.IsManuallyOperated,
-                EnergyConsumption = entity.EnergyConsumption,
-                OnTime = entity.OnTime,
-                OffTime = entity.OffTime,
-                IsOn = entity.IsOn,
-                Degree = null,
-            };
-
-            switch (entity)
-            {
-                case DishwasherEntity charger:
-                    break;
-                case DryerEntity dryer:
-                    break;
-                case ElectricCarChargerEntity charger:
-                    break;
-                case HeatPumpEntity heatPump:
-                    model.Degree = heatPump.Degree;
-                    break;
-                case WashingMachineEntity charger:
-                    break;
-            }
-
-            return model;
-        }
-
-        private IoTDeviceBaseEntity MapToDeviceEntity(DeviceDTO model)
-        {
-            IoTDeviceBaseEntity entity = model.DeviceType switch
-            {
-                "Dishwasher" => new DishwasherEntity(),
-                "Dryer" => new DryerEntity(),
-                "CarCharger" => new ElectricCarChargerEntity(),
-                "HeatPump" => new HeatPumpEntity(),
-                "WashingMachine" => new WashingMachineEntity(),
-                _ => throw new ArgumentException("Unknown device type", nameof(model.DeviceType))
-            };
-
-            entity.UserGuid = model.UserGuid;
-            entity.DeviceName = model.DeviceName;
-            entity.Serial = model.Serial;
-            entity.IsManuallyOperated = model.IsManuallyOperated;
-            entity.EnergyConsumption = model.EnergyConsumption;
-            entity.OnTime = model.OnTime;
-            entity.OffTime = model.OffTime;
-            entity.IsOn = model.IsOn;
-
-
-            if (entity is HeatPumpEntity heatPump && model.Degree.HasValue)
-            {
-                heatPump.Degree = model.Degree.Value;
-            }
-
-            return entity;
-        }
+        }       
     }
 }

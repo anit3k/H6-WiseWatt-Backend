@@ -73,8 +73,33 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             foreach (var device in devices)
             {
                 device.UserGuid = user.UserGuid;
+                device.Serial = GetStaticSerialForTestUser(device.DeviceType);
                 await _deviceRepo.CreateDevice(device);
             }
-        }        
+        }
+
+        private string GetStaticSerialForTestUser(IoTUnit deviceType)
+        {
+            switch (deviceType)
+            {
+                case IoTUnit.Dishwasher:
+                    return "Bosch-21bc9772";
+                    break;
+                case IoTUnit.Dryer:
+                    return "Mille-1d726d91";
+                    break;
+                case IoTUnit.CarCharger:
+                    return "Clever-ca620c26";
+                    break;
+                case IoTUnit.HeatPump:
+                    return "LG-5ebc34fe";
+                    break;
+                case IoTUnit.WashingMachine:
+                    return "Blomberg-dd273f05";
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
     }
 }

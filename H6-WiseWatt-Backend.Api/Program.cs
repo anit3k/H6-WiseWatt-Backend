@@ -1,3 +1,4 @@
+using H6_WiseWatt_Backend.Api.Utils;
 using H6_WiseWatt_Backend.Domain.Interfaces;
 using H6_WiseWatt_Backend.Domain.Services;
 using H6_WiseWatt_Backend.MySqlData;
@@ -18,9 +19,11 @@ Log.Logger = new LoggerConfiguration()
             .CreateLogger();
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+// API Dependecy Injections
+builder.Services.AddTransient<DeviceDTOMapper>();
+builder.Services.AddTransient<AuthenticationUtility>();
 
 // Database and repo
 builder.Services.AddTransient<MySqlDbContext>();
