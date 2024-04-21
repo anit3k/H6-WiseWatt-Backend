@@ -2,6 +2,7 @@ using H6_WiseWatt_Backend.Api.Utils;
 using H6_WiseWatt_Backend.Domain.Interfaces;
 using H6_WiseWatt_Backend.Domain.Services;
 using H6_WiseWatt_Backend.MySqlData;
+using H6_WiseWatt_Backend.MySqlData.Utils;
 using H6_WiseWatt_Backend.Security;
 using H6_WiseWatt_Backend.Security.Interfaces;
 using H6_WiseWatt_Backend.Security.Models;
@@ -19,22 +20,27 @@ Log.Logger = new LoggerConfiguration()
             .CreateLogger();
 
 builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-// API Dependecy Injections
-builder.Services.AddTransient<DeviceDTOMapper>();
-builder.Services.AddTransient<AuthenticationUtility>();
 
-// Database and repo
+// API Specific
+builder.Services.AddTransient<AuthenticationUtility>();
+builder.Services.AddTransient<DeviceDTOMapper>();
+builder.Services.AddTransient<UserDTOMapper>();
+
+// Data Specific
 builder.Services.AddTransient<MySqlDbContext>();
 builder.Services.AddTransient<IUserRepo, UserRepo>();
+builder.Services.AddTransient<UserDbMapper>();
 builder.Services.AddTransient<IDeviceRepo, DeviceRepo>();
 builder.Services.AddTransient<IElectricityPriceRepo, ElectricityPriceRepo>();
 
 // Domain Specific Services
+builder.Services.AddTransient<IUserManager, UserManager>();
 builder.Services.AddSingleton<IDeviceFactory, DeviceFactoryService>();
-builder.Services.AddTransient<IDeviceService, DeviceService>();
-builder.Services.AddTransient<IDeviceConsumptionService, DeviceConsumptionService>();
+builder.Services.AddTransient<IDeviceManager, DeviceManager>();
+builder.Services.AddTransient<IConsumptionCalculator, ConsumptionCalculator>();
 builder.Services.AddTransient<IElectricPriceService, ElectricPriceService>();
 builder.Services.AddHttpClient();
 
@@ -42,6 +48,7 @@ builder.Services.AddHttpClient();
 // Security services
 builder.Services.AddTransient<ITokenGenerator, TokenGenerator>();
 builder.Services.AddTransient<IPasswordHasher, PasswordHasher>();
+
 // Authentication schema
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -60,7 +67,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-
+// Disable CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",
@@ -85,6 +92,7 @@ app.UseCors("AllowAllOrigins");
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

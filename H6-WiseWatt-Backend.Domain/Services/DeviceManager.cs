@@ -3,11 +3,11 @@ using H6_WiseWatt_Backend.Domain.Interfaces;
 
 namespace H6_WiseWatt_Backend.Domain.Services
 {
-    public class DeviceService : IDeviceService
+    public class DeviceManager : IDeviceManager
     {
         private readonly IDeviceRepo _deviceRepo;
 
-        public DeviceService(IDeviceRepo deviceRepo)
+        public DeviceManager(IDeviceRepo deviceRepo)
         {
             _deviceRepo = deviceRepo;
         }
@@ -15,6 +15,7 @@ namespace H6_WiseWatt_Backend.Domain.Services
         public async Task<IoTDeviceBaseEntity> GetDevice(string serialNo)
         {
             var device = await _deviceRepo.GetDevice(serialNo);
+            if (device == null) { return null; }
             UpdateOnStatus(device, DateTime.Now.TimeOfDay);
             return device;
         }

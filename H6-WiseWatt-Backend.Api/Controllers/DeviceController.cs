@@ -11,25 +11,25 @@ namespace H6_WiseWatt_Backend.Api.Controllers
     [ApiController]
     public class DeviceController : ControllerBase
     {
-        private readonly IDeviceService _deviceService;
+        private readonly IDeviceManager _deviceManager;
         private readonly DeviceDTOMapper _deviceMapper;
         private readonly AuthenticationUtility _utility;
 
-        public DeviceController(IDeviceService deviceService, DeviceDTOMapper deviceMapper, AuthenticationUtility utility)
+        public DeviceController(IDeviceManager deviceManager, DeviceDTOMapper deviceMapper, AuthenticationUtility utility)
         {
-            _deviceService = deviceService;
+            _deviceManager = deviceManager;
             _deviceMapper = deviceMapper;
             _utility = utility;
         }
 
-        #region Get Device
+        #region Get Device State
         [HttpGet]
         [Route("api/device/state")]
         public async Task<IActionResult> GetState(string serial)
         {
             try
-            {
-                var result = await _deviceService.GetDevice(serial);
+            {                
+                var result = await _deviceManager.GetDevice(serial);
                 if (result == null)
                 {
                     return BadRequest("No Device Found!");
@@ -84,7 +84,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 }
                 var deviceEntity = _deviceMapper.MapToDeviceEntity(device);
 
-                await _deviceService.UpdateDevice(deviceEntity);
+                await _deviceManager.UpdateDevice(deviceEntity);
                 return Ok("Device Updated");
             }
             catch (Exception ex)
@@ -97,7 +97,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         private async Task<List<IoTDeviceBaseEntity>> GetCurrentUserDevices(string? userId)
         {
             Log.Information($"User {userId} request a list of all devices");
-            var result = await _deviceService.GetDevices(userId);
+            var result = await _deviceManager.GetDevices(userId);
             return result;
         }        
     }

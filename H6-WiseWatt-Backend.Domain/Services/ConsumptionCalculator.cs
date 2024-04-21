@@ -3,17 +3,20 @@ using H6_WiseWatt_Backend.Domain.Interfaces;
 
 namespace H6_WiseWatt_Backend.Domain.Services
 {
-    public class DeviceConsumptionService : IDeviceConsumptionService
+    public class ConsumptionCalculator : IConsumptionCalculator
     {
+        private readonly IDeviceManager _deviceManager;
         private readonly IElectricPriceService _electricPriceService;
 
-        public DeviceConsumptionService(IElectricPriceService electricPriceService)
+        public ConsumptionCalculator(IDeviceManager deviceManager, IElectricPriceService electricPriceService)
         {
+            _deviceManager = deviceManager;
             _electricPriceService = electricPriceService;
         }
 
-        public async Task<List<Tuple<string, double, double>>> GetSummaryOfDailyConsumption(List<IoTDeviceBaseEntity> devices)
+        public async Task<List<Tuple<string, double, double>>> GetSummaryOfDailyConsumption(string userGuid)
         {
+            var devices = await GetUserDevices(userGuid);
             var prices = await _electricPriceService.GetElectricityPricesAsync(); // Fetch hourly prices.
             var result = new List<Tuple<string, double, double>>();
             double totalConsumption = 0;
@@ -43,10 +46,14 @@ namespace H6_WiseWatt_Backend.Domain.Services
             return result;
         }
 
-
-
-        public Dictionary<string, double> GetDailyPercentageByDevice(List<IoTDeviceBaseEntity> devices)
+        private async Task<List<IoTDeviceBaseEntity>> GetUserDevices(string userGuid)
         {
+            return await _deviceManager.GetDevices(userGuid);
+        }
+
+        public async Task<Dictionary<string, double>> GetDailyPercentageByDevice(string userGuid)
+        {
+            var devices = await GetUserDevices(userGuid);
             var result = new Dictionary<string, double>();
             var dailyConsumption = new Dictionary<string, double>();
             double totalConsumption = 0;
@@ -67,8 +74,9 @@ namespace H6_WiseWatt_Backend.Domain.Services
             return result;
         }
 
-        public Dictionary<string, List<double>> GetHourlyConsumptionByDevice(List<IoTDeviceBaseEntity> devices)
+        public async Task<Dictionary<string, List<double>>> GetHourlyConsumptionByDevice(string userGuid)
         {
+            var devices = await GetUserDevices(userGuid);
             var result = new Dictionary<string, List<double>>();
             foreach (var device in devices)
             {
@@ -142,7 +150,5 @@ namespace H6_WiseWatt_Backend.Domain.Services
 
             return hourlyConsumption;
         }
-
-
     }
 }

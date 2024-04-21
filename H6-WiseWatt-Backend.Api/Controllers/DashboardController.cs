@@ -1,6 +1,5 @@
 ﻿using H6_WiseWatt_Backend.Api.Models;
 using H6_WiseWatt_Backend.Api.Utils;
-using H6_WiseWatt_Backend.Domain.Entities.IotEntities;
 using H6_WiseWatt_Backend.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,20 +11,16 @@ namespace H6_WiseWatt_Backend.Api.Controllers
     [ApiController]
     public class DashboardController : ControllerBase
     {
-        private readonly IDeviceService _deviceService;
-        private readonly IDeviceConsumptionService _deviceConsumptionService;
+        private readonly IConsumptionCalculator _consumptionCalculator;
         private readonly IElectricPriceService _electricPriceService;
         private readonly AuthenticationUtility _utility;
 
-        public DashboardController(IDeviceService deviceService, IDeviceConsumptionService deviceConsumptionService, IElectricPriceService electricPriceService, AuthenticationUtility utility)
+        public DashboardController(IConsumptionCalculator deviceConsumptionService, IElectricPriceService electricPriceService, AuthenticationUtility utility)
         {
-            _deviceService = deviceService;
-            _deviceConsumptionService = deviceConsumptionService;
+            _consumptionCalculator = deviceConsumptionService;
             _electricPriceService = electricPriceService;
             _utility = utility;
-        }
-
-        
+        }        
 
         #region Get Daily Percentage
         [HttpGet]
@@ -40,9 +35,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                     return BadRequest("Invalid User");
                 }
 
-                var deviceEntities = await GetCurrentUserDevices(userGuid);
-
-                var result = _deviceConsumptionService.GetDailyPercentageByDevice(deviceEntities);
+                var result = await _consumptionCalculator.GetDailyPercentageByDevice(userGuid);
                 var formattedResponse = result.Select(kvp => new PercentageDTO
                 {
                     Value = Math.Round(kvp.Value, 2),
@@ -72,8 +65,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                     return BadRequest("Invalid User");
                 }
 
-                var deviceEntities = await GetCurrentUserDevices(userGuid);
-                var deviceData = _deviceConsumptionService.GetHourlyConsumptionByDevice(deviceEntities);
+                var deviceData = await _consumptionCalculator.GetHourlyConsumptionByDevice(userGuid);
 
                 var consumptionDtos = deviceData.Select(d => new HourlyConsumptionDTO
                 {
@@ -105,8 +97,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                     return BadRequest("Invalid User");
                 }
 
-                var deviceEntities = await GetCurrentUserDevices(userGuid);
-                var data = await _deviceConsumptionService.GetSummaryOfDailyConsumption(deviceEntities);
+                var data = await _consumptionCalculator.GetSummaryOfDailyConsumption(userGuid);
 
                 var formattedItems = data.Select(i => new
                 {
@@ -138,7 +129,6 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                     return BadRequest("Invalid User");
                 }
 
-                var deviceEntities = await GetCurrentUserDevices(userGuid);
                 var prices = await _electricPriceService.GetElectricityPricesAsync();
                 var today = DateTime.Today;
                 var filteredPrices = prices.Where(p => p.TimeStamp.Date >= today)
@@ -159,13 +149,6 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
             }
         }
-        #endregion
-       
-        private async Task<List<IoTDeviceBaseEntity>> GetCurrentUserDevices(string? userId)
-        {
-            Log.Information($"User {userId} request a list of all devices");
-            var result = await _deviceService.GetDevices(userId);
-            return result;
-        }       
+        #endregion          
     }
 }
