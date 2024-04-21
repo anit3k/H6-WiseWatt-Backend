@@ -168,7 +168,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
 
         private bool IsNotValid(UserDTO user)
         {
-            return user == null || string.IsNullOrWhiteSpace(user.Firstname) && string.IsNullOrWhiteSpace(user.Password) && string.IsNullOrWhiteSpace(user.Email);
+            return user == null || string.IsNullOrWhiteSpace(user.Firstname) || string.IsNullOrWhiteSpace(user.Password) || string.IsNullOrWhiteSpace(user.Email) || string.IsNullOrWhiteSpace(user.Lastname);
         }
 
         private async Task<bool> DoUserExist(UserDTO user)
