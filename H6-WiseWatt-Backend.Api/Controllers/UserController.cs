@@ -54,6 +54,42 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("api/user/get")]
+        [Authorize]
+        public async Task<IActionResult> Get()
+        {
+            try
+            {
+                var userGuid = _utility.GetUserGuidFromToken(User);
+                if (_utility.ValidateUser(userGuid))
+                {
+                    return BadRequest("Invalid User");
+                }
+
+                var user = await GetUser(userGuid);
+                if (user != null)
+                {
+                    return Ok(user);
+                }
+                else
+                {
+                    return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"An error has occurred with error message: {ex.Message}");
+                return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
+            }
+        }
+
+        private async Task<UserDTO> GetUser(string? userGuid)
+        {
+            var result = await _userManager.GetUser(new UserEntity { UserGuid = userGuid });
+            return _userMapper.MapToUserDto(result);
+        }
+
         [HttpPost]
         [Route("api/user/update")]
         [Authorize]

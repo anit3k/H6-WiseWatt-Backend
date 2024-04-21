@@ -44,7 +44,7 @@ namespace H6_WiseWatt_Backend.MySqlData
 
         public async Task<UserEntity?> GetUser(UserEntity user)
         {
-            var dbUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+            var dbUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserGuid == user.UserGuid || u.Email == user.Email);
             if (dbUser == null) { return null; }
             return _userMapper.MapToUserEntity(dbUser);
         }
