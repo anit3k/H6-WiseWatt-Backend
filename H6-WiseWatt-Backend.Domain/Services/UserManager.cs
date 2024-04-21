@@ -37,6 +37,11 @@ namespace H6_WiseWatt_Backend.Domain.Services
             }
         }
 
+        public Task<bool> DeleteCurrentUser(string userGuide)
+        {
+            return _userRepo.DeleteUser(userGuide);
+        }
+
         public Task<UserEntity> GetUser(UserEntity user)
         {
             return _userRepo.GetUser(user);

@@ -64,5 +64,20 @@ namespace H6_WiseWatt_Backend.MySqlData
             await _dbContext.SaveChangesAsync();
             return _userMapper.MapToUserEntity(dbUser, user.Password);
         }
+
+        public async Task<bool> DeleteUser(string userGuid)
+        {
+            var dbUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserGuid == userGuid);
+            if (dbUser != null) 
+            {
+                _dbContext.Users.Remove(dbUser);
+                var result = await _dbContext.SaveChangesAsync();
+                if (result == 1)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

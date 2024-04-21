@@ -84,6 +84,41 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("api/user/delete")]
+        [Authorize]
+        public async Task<IActionResult> Delete()
+        {
+            try
+            {
+                var userGuid = _utility.GetUserGuidFromToken(User);
+                if (_utility.ValidateUser(userGuid))
+                {
+                    return BadRequest("Invalid User");
+                }
+
+                var userDeleted = await DeleteUser(userGuid);
+                if (userDeleted == true)
+                {
+                    return Ok("user has been deleted");
+                }
+                else
+                {
+                    return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"An error has occurred with error message: {ex.Message}");
+                return StatusCode(statusCode: 500, "Something went wrong please contact your administrator");
+            }
+        }
+
+        private async Task<bool> DeleteUser(string? userGuid)
+        {
+            return await _userManager.DeleteCurrentUser(userGuid);
+        }
+
         private async Task<UserDTO> UpdateUser(UserDTO user, string userGuid)
         {
             var reuslt = await _userManager.UpdateCurrentUser(_userMapper.MapToUserEntity(user, userGuid));
