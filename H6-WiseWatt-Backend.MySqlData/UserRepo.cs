@@ -53,13 +53,28 @@ namespace H6_WiseWatt_Backend.MySqlData
         {
             var dbUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserGuid == user.UserGuid);
 
-            var salt = _passwordService.GenerateSalt();
-            var passwordHash = _passwordService.HashPasswordWithSalt(user.Password, salt);
-            dbUser.Firstname = user.Firstname;
-            dbUser.Lastname = user.Lastname;
-            dbUser.Email = user.Email;
-            dbUser.PasswordHash = passwordHash;
-            dbUser.Salt = salt;
+            if (user.Firstname != null && dbUser.Firstname != user.Firstname)
+            {
+                dbUser.Firstname = user.Firstname;
+            }
+
+            if (user.Lastname != null && dbUser.Lastname != user.Lastname)
+            {
+                dbUser.Lastname = user.Lastname;
+            }
+
+            if (user.Email != null && dbUser.Email != user.Email)
+            {
+                dbUser.Email = user.Email;
+            }
+
+            if (!string.IsNullOrEmpty(user.Password))
+            {
+                var salt = _passwordService.GenerateSalt();
+                var passwordHash = _passwordService.HashPasswordWithSalt(user.Password, salt);
+                dbUser.PasswordHash = passwordHash;
+                dbUser.Salt = salt;
+            }
 
             await _dbContext.SaveChangesAsync();
             return _userMapper.MapToUserEntity(dbUser, user.Password);
