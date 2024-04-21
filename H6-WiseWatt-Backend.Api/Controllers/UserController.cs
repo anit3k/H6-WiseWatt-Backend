@@ -133,6 +133,11 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                     return BadRequest("Invalid User");
                 }
 
+                if (userGuid == "f10774ec-bc8b-40a6-9049-32634363e298")
+                {
+                    return BadRequest("Test user cannot be deleted!");
+                }
+
                 var userDeleted = await DeleteUser(userGuid);
                 if (userDeleted == true)
                 {
