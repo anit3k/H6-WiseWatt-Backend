@@ -15,6 +15,7 @@ namespace H6_WiseWatt_Backend.Domain.Services
         public async Task<IoTDeviceBaseEntity> GetDevice(string serialNo)
         {
             var device = await _deviceRepo.GetDevice(serialNo);
+            if (device == null) { return null; }
             UpdateOnStatus(device, DateTime.Now.TimeOfDay);
             return device;
         }

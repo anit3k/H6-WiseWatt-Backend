@@ -24,6 +24,7 @@ namespace H6_WiseWatt_Backend.MySqlData
         public async Task<IoTDeviceBaseEntity> GetDevice(string serialNo)
         {
             var dbDevice = await _dbContext.Devices.Where(s => s.Serial == serialNo).FirstOrDefaultAsync();
+            if (dbDevice == null) { return null; }
             return MapToDeviceEntity(dbDevice);
         }
         public async Task<List<IoTDeviceBaseEntity>> GetDevices(string userGuid)

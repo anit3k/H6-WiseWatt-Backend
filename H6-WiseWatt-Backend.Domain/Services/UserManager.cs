@@ -42,6 +42,11 @@ namespace H6_WiseWatt_Backend.Domain.Services
             return _userRepo.GetUser(user);
         }
 
+        public async Task<UserEntity> UpdateCurrentUser(UserEntity user)
+        {
+            return await _userRepo.UpdateUser(user);
+        }
+
         public async Task<bool> ValidateUserByEmail(string email)
         {
             return await _userRepo.ValidateUserEmail(email);

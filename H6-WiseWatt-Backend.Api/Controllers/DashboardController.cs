@@ -15,11 +15,11 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         private readonly IElectricPriceService _electricPriceService;
         private readonly AuthenticationUtility _utility;
 
-        public DashboardController(IConsumptionCalculator deviceConsumptionService, IElectricPriceService electricPriceService, AuthenticationUtility authUtil)
+        public DashboardController(IConsumptionCalculator deviceConsumptionService, IElectricPriceService electricPriceService, AuthenticationUtility utility)
         {
             _consumptionCalculator = deviceConsumptionService;
             _electricPriceService = electricPriceService;
-            _utility = authUtil;
+            _utility = utility;
         }        
 
         #region Get Daily Percentage

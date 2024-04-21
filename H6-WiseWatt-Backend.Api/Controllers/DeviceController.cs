@@ -28,7 +28,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         public async Task<IActionResult> GetState(string serial)
         {
             try
-            {
+            {                
                 var result = await _deviceManager.GetDevice(serial);
                 if (result == null)
                 {
