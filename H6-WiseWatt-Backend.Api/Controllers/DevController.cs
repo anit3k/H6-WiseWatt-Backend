@@ -58,9 +58,9 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             var passwordHash = _passwordService.HashPasswordWithSalt("Kode1234!", salt);
             var user = new UserDbModel
             {
-                Firstname = "Luke",
-                Lastname = "Skywalker",
-                Email = "luke@skywalker.com",
+                Firstname = "John",
+                Lastname = "Doe",
+                Email = "john@test.io",
                 PasswordHash = passwordHash,
                 Salt = salt,
                 UserGuid = "f10774ec-bc8b-40a6-9049-32634363e298"
