@@ -3,9 +3,22 @@ using H6_WiseWatt_Backend.Domain.Entities.IotEntities;
 
 namespace H6_WiseWatt_Backend.Api.Utils
 {
+    /// <summary>
+    /// Utility designed to map between DeviceDTO and IoTDeviceBaseEntity objects. 
+    /// This class helps translate data between Data Transfer Objects (DTOs) 
+    /// and domain entities, which represent the core business objects within the backend.
+    /// </summary>
     public class DeviceDTOMapper
     {
-        public DeviceDTO MapToDeviceDto(IoTDeviceBaseEntity entity)
+        #region Internal Methods
+        /// <summary>
+        /// Converts an IoTDeviceBaseEntity to a DeviceDTO. It populates the DTO with the appropriate attributes from the entity, 
+        /// including user identifiers, device characteristics, and operational details. 
+        /// It also handles special cases based on specific device types (e.g., setting the Degree for heat pumps).
+        /// </summary>
+        /// <param name="entity">Current IoT Device</param>
+        /// <returns>DeviceDTO</returns>
+        internal DeviceDTO MapToDeviceDto(IoTDeviceBaseEntity entity)
         {
             var model = new DeviceDTO
             {
@@ -39,7 +52,15 @@ namespace H6_WiseWatt_Backend.Api.Utils
             return model;
         }
 
-        public IoTDeviceBaseEntity MapToDeviceEntity(DeviceDTO model)
+        /// <summary>
+        /// Converts a DeviceDTO to an IoTDeviceBaseEntity. 
+        /// This method creates an instance of the appropriate device type 
+        /// based on the DeviceType attribute and then populates the entity with information from the DTO. 
+        /// It throws an ArgumentException if the device type is unknown.
+        /// </summary>
+        /// <param name="model">DeviceDTO<param>
+        /// <returns>IoTDeviceBaseEntity</returns>
+        internal IoTDeviceBaseEntity MapToDeviceEntity(DeviceDTO model)
         {
             IoTDeviceBaseEntity entity = model.DeviceType switch
             {
@@ -68,5 +89,6 @@ namespace H6_WiseWatt_Backend.Api.Utils
 
             return entity;
         }
+        #endregion
     }
 }

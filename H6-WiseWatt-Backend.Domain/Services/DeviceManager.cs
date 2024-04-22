@@ -50,7 +50,8 @@ namespace H6_WiseWatt_Backend.Domain.Services
                 }
                 else
                 {
-                    device.IsOn = (currentTime >= device.OnTime || currentTime <= device.OffTime); // Over midnight case
+                    // Over midnight case
+                    device.IsOn = (currentTime >= device.OnTime || currentTime <= device.OffTime); 
                 }
             }
         }

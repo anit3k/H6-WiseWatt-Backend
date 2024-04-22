@@ -8,15 +8,23 @@ using Serilog;
 
 namespace H6_WiseWatt_Backend.Api.Controllers
 {
+    /// <summary>
+    /// Resets the database, adds a default test user, and retrieves the current electricity prices. 
+    /// This endpoint is useful during development and testing,
+    /// but is typically restricted in production environments to prevent unauthorized tampering with the database.
+    /// </summary>
     [ApiController]
     public class DevController : ControllerBase
     {
+        #region private fields
         private readonly MySqlDbContext _dbContext;
         private readonly IPasswordHasher _passwordService;
         private readonly IDeviceFactory _deviceFactory;
         private readonly IDeviceRepo _deviceRepo;
         private readonly IElectricPriceService _priceService;
+        #endregion
 
+        #region Constructor
         public DevController(MySqlDbContext dbContext,IPasswordHasher passwordService, IDeviceFactory deviceFactory, IDeviceRepo deviceStorageRepo, IElectricPriceService priceService)
         {
             _dbContext = dbContext;
@@ -25,9 +33,12 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             _deviceRepo = deviceStorageRepo;
             _priceService = priceService;
         }
+        #endregion
 
-        /// <summary>
-        /// This method is used for development purpose, and is used to reset the database
+        #region Public Methods
+                /// <summary>
+        /// This method is used for development purpose, and is used to reset the database,
+        /// add a default test user, and retrieve the current electricity prices.
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -39,7 +50,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 await _dbContext.Database.EnsureDeletedAsync();
                 await _dbContext.Database.EnsureCreatedAsync();
                 _dbContext.ChangeTracker.Clear();
-                await AddDefaultTestData2();
+                await AddDefaultTestUser();
                  var temp = await _priceService.GetElectricityPricesAsync();
 
                 Log.Information("The Database has been reset");
@@ -51,8 +62,13 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 return StatusCode(500, $"Internal Server Error, contact your administrator if continues.../n" + ex.Message);
             }
         }
+        #endregion
 
-        private async Task AddDefaultTestData2()
+        #region Private Methods
+        /// <summary>
+        /// Creates the deafult test user, this user i also the one hocked on or IoT simulations
+        /// </summary>
+        private async Task AddDefaultTestUser()
         {
             var salt = _passwordService.GenerateSalt();
             var passwordHash = _passwordService.HashPasswordWithSalt("Kode1234!", salt);
@@ -78,6 +94,9 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Used to make sure that the test users IoT units, always gets the same serial number.
+        /// </summary>
         private string GetStaticSerialForTestUser(IoTUnit deviceType)
         {
             switch (deviceType)
@@ -101,5 +120,6 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                     throw new NotImplementedException();
             }
         }
+        #endregion
     }
 }

@@ -1,5 +1,9 @@
 ﻿namespace H6_WiseWatt_Backend.Api.Models
 {
+    /// <summary>
+    /// Data Transfer Object (DTO) designed to represent the structure and attributes of an IoT device within an API context. 
+    /// DTOs are commonly used to transfer data between client applications and backend services, providing a clear contract for data exchange.
+    /// </summary>
     public class DeviceDTO
     {
         public string UserGuid { get; set; }
