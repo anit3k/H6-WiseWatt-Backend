@@ -25,7 +25,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         #endregion
 
         #region Constructor
-        public DevController(MySqlDbContext dbContext,IPasswordHasher passwordService, IDeviceFactory deviceFactory, IDeviceRepo deviceStorageRepo, IElectricPriceService priceService)
+        public DevController(MySqlDbContext dbContext, IPasswordHasher passwordService, IDeviceFactory deviceFactory, IDeviceRepo deviceStorageRepo, IElectricPriceService priceService)
         {
             _dbContext = dbContext;
             _passwordService = passwordService;
@@ -36,25 +36,32 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         #endregion
 
         #region Public Methods
-                /// <summary>
+        /// <summary>
         /// This method is used for development purpose, and is used to reset the database,
         /// add a default test user, and retrieve the current electricity prices.
         /// </summary>
         /// <returns></returns>
         [HttpGet]
         [Route("api/dev/reset")]
-        public async Task<IActionResult> ResetDb()
+        public async Task<IActionResult> ResetDb(ShireToken key)
         {
             try
             {
-                await _dbContext.Database.EnsureDeletedAsync();
-                await _dbContext.Database.EnsureCreatedAsync();
-                _dbContext.ChangeTracker.Clear();
-                await AddDefaultTestUser();
-                 var temp = await _priceService.GetElectricityPricesAsync();
+                if (CheckElvenPassword(key))
+                {
+                    await _dbContext.Database.EnsureDeletedAsync();
+                    await _dbContext.Database.EnsureCreatedAsync();
+                    _dbContext.ChangeTracker.Clear();
+                    await AddDefaultTestUser();
+                    var temp = await _priceService.GetElectricityPricesAsync();
 
-                Log.Information("The Database has been reset");
-                return Ok("Db has been reset");
+                    Log.Information("The Database has been reset");
+                    return Ok("Db has been reset"); 
+                }
+                else
+                {
+                    return BadRequest("You shall not pass!");
+                }
             }
             catch (Exception ex)
             {
@@ -65,8 +72,14 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         #endregion
 
         #region Private Methods
+
+        private bool CheckElvenPassword(ShireToken key)
+        {
+            return key.ElvenFriend == "Mellon";
+        }
+
         /// <summary>
-        /// Creates the deafult test user, this user i also the one hocked on or IoT simulations
+        /// Creates the default test user, this user i also the one hocked on or IoT simulations
         /// </summary>
         private async Task AddDefaultTestUser()
         {
@@ -81,7 +94,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 Salt = salt,
                 UserGuid = "f10774ec-bc8b-40a6-9049-32634363e298"
             };
-            _dbContext.Users.Add(user); 
+            _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
 
             var devices = _deviceFactory.CreateDefaultDevices();
@@ -121,5 +134,10 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             }
         }
         #endregion
+    }
+
+    public class ShireToken
+    {
+        public string ElvenFriend { get; set; }
     }
 }
