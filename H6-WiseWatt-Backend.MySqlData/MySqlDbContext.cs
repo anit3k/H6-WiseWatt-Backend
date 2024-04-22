@@ -5,6 +5,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace H6_WiseWatt_Backend.MySqlData
 {
+    /// <summary>
+    /// Represents the database context for interacting with the MySQL database
+    /// </summary>
     public class MySqlDbContext : DbContext
     {
         #region fields

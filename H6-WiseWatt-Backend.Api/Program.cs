@@ -34,7 +34,9 @@ builder.Services.AddTransient<MySqlDbContext>();
 builder.Services.AddTransient<IUserRepo, UserRepo>();
 builder.Services.AddTransient<UserDbMapper>();
 builder.Services.AddTransient<IDeviceRepo, DeviceRepo>();
+builder.Services.AddTransient<DeviceDbMapper>();
 builder.Services.AddTransient<IElectricityPriceRepo, ElectricityPriceRepo>();
+builder.Services.AddTransient<ElectricityPriceDbMapper>();
 
 // Domain Specific Services
 builder.Services.AddTransient<IUserManager, UserManager>();
