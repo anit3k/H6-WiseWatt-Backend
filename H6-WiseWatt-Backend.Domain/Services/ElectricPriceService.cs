@@ -5,16 +5,32 @@ using System.Text.RegularExpressions;
 
 namespace H6_WiseWatt_Backend.Domain.Services
 {
+    /// <summary>
+    /// Provides functionality for retrieving and updating electricity prices within the domain layer. 
+    /// It implements the IElectricPriceService interface, defining methods for fetching electricity price data, 
+    /// either from a repository or from an external source via HTTP requests.
+    /// </summary>
     public class ElectricPriceService : IElectricPriceService
     {
+        #region fields
         private readonly IElectricityPriceRepo _priceRepo;
         private readonly HttpClient _httpClient;
+        #endregion
 
+        #region Constructor
         public ElectricPriceService(IElectricityPriceRepo priceRepo, HttpClient httpClient)
         {
             _priceRepo = priceRepo;
             _httpClient = httpClient;
         }
+        #endregion
+
+        #region Public Methods
+        /// <summary>
+        /// Asynchronously retrieves a list of all electricity prices from the repository. 
+        /// If the repository is empty or contains outdated data, it triggers a refresh of electricity prices by calling FetchNewPrices().
+        /// </summary>
+        /// <returns>A list of electricity prices</returns>
         public async Task<List<ElectricityPriceEntity>> GetElectricityPricesAsync()
         {
             var allPrices = await _priceRepo.GetAllPrices();
@@ -27,7 +43,13 @@ namespace H6_WiseWatt_Backend.Domain.Services
 
             return allPrices;
         }
+        #endregion
 
+        #region Private Methods
+        /// <summary>
+        /// Fetches new electricity prices from an external source, parses the data, and updates the repository. 
+        /// It uses HTTP to retrieve data in CSV format and processes each line to extract electricity price information.
+        /// </summary>
         private async Task FetchNewPrices()
         {
             string startDate = DateTime.UtcNow.AddDays(-4).ToString("yyyy-MM-dd");
@@ -57,6 +79,10 @@ namespace H6_WiseWatt_Backend.Domain.Services
             }
         }
 
+        /// <summary>
+        /// Parses a line from the CSV file, extracting electricity price data and returning an ElectricityPriceEntity. 
+        /// If the line format is incorrect, it throws a FormatException.
+        /// </summary>
         private ElectricityPriceEntity ParseLine(string line)
         {
             var matches = Regex.Matches(line, "\"([^\"]*)\"");
@@ -73,9 +99,13 @@ namespace H6_WiseWatt_Backend.Domain.Services
             throw new FormatException("Line format incorrect, expected 4 columns.");
         }
 
+        /// <summary>
+        /// Converts a string to a double, handling cultural differences in number formatting (e.g., using . as the decimal separator).
+        /// </summary>
         private double ParseDouble(string value)
         {
             return double.Parse(value.Replace(',', '.'), CultureInfo.InvariantCulture);
         }
+        #endregion
     }    
 }

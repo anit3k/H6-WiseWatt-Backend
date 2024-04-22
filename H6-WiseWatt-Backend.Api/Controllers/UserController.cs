@@ -161,7 +161,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 var userDeleted = await DeleteUser(userGuid);
                 if (userDeleted == true)
                 {
-                    return Ok("user has been deleted");
+                    return Ok();
                 }
                 else
                 {
