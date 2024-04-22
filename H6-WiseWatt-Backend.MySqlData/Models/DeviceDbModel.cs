@@ -2,8 +2,12 @@
 
 namespace H6_WiseWatt_Backend.MySqlData.Models
 {
+    /// <summary>
+    /// Data model for storing device-related information in a MySQL database. It corresponds to the Device entity class used in the application's domain logic.
+    /// </summary>
     public class DeviceDbModel
     {
+        #region Properties
         public int Id { get; set; }
        
         public string UserGuid { get; set; }
@@ -25,5 +29,6 @@ namespace H6_WiseWatt_Backend.MySqlData.Models
         [Column(TypeName = "time")]
         public TimeSpan OffTime { get; set; }
         public int Degree { get; set; }
+        #endregion
     }
 }
