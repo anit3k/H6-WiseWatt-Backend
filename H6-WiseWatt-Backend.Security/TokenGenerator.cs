@@ -8,14 +8,31 @@ using System.Security.Claims;
 
 namespace H6_WiseWatt_Backend.Security
 {
+    /// <summary>
+    /// Responsible for creating JWTs that are used for user authentication and authorization in a secure system. 
+    /// It interacts with configuration settings to obtain JWT-related parameters such as token secret, issuer, audience, and expiration time. 
+    /// The class uses cryptographic methods to ensure the security of the generated tokens.
+    /// </summary>
     public class TokenGenerator : ITokenGenerator
     {
+        #region fields
         private readonly IConfiguration _config;
+        #endregion
+
+        #region Constructor
         public TokenGenerator(IConfiguration config)
         {
             _config = config;
         }
+        #endregion
 
+        #region Public Methods
+        /// <summary>
+        /// Creates a JWT for a specified user by adding claims, configuring the token's security credentials, and setting the issuer, audience, and expiration time. 
+        /// It uses the HMAC SHA-256 algorithm to sign the token and returns the token as a Base64-encoded string.
+        /// </summary>
+        /// <param name="user">UserEntity user: The user entity for which the token is generated.</param>
+        /// <returns>string - The generated JWT as a string</returns>
         public string GenerateJSonWebToken(UserEntity user)
         {
             var model = GetJwtSettings();
@@ -40,10 +57,18 @@ namespace H6_WiseWatt_Backend.Security
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             return jwtTokenHandler.WriteToken(token);
         }
+        #endregion
 
-        private JwtSettingEntity GetJwtSettings()
+        #region Private Methods
+        /// <summary>
+        /// Fetches the JWT-related configuration settings from a configuration source (e.g., appsettings.json). 
+        /// It is used internally by the TokenGenerator to configure the generation of JSON Web Tokens.
+        /// </summary>
+        /// <returns>JwtSettingModel - The JWT settings model containing token secret, issuer, audience, and expiration information.</returns>
+        private JwtSettingModel GetJwtSettings()
         {
-            return _config.GetSection("JWT").Get<JwtSettingEntity>();
+            return _config.GetSection("JWT").Get<JwtSettingModel>();
         }
+        #endregion
     }
 }

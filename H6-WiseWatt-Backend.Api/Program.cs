@@ -55,7 +55,7 @@ builder.Services.AddTransient<IPasswordHasher, PasswordHasher>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        var tokenSettings = builder.Configuration.GetSection("JWT").Get<JwtSettingEntity>();
+        var tokenSettings = builder.Configuration.GetSection("JWT").Get<JwtSettingModel>();
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
