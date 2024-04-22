@@ -56,11 +56,11 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                     var temp = await _priceService.GetElectricityPricesAsync();
 
                     Log.Information("The Database has been reset");
-                    return Ok("Db has been reset"); 
+                    return Ok("Db has been reset");
                 }
                 else
                 {
-                    return BadRequest("You shall not pass!");
+                    return BadRequest(GetRandomResponse());
                 }
             }
             catch (Exception ex)
@@ -77,6 +77,8 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         {
             return key.ElvenFriend == "Mellon";
         }
+
+
 
         /// <summary>
         /// Creates the default test user, this user i also the one hocked on or IoT simulations
@@ -132,6 +134,32 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        private string GetRandomResponse()
+        {
+            string[] responses = new[]
+            {
+                "The Eye of Sauron has noticed an error. Double-check your input.",
+                "You shall not pass! The request is invalid.",
+                "Something went wrong in the Mines of Moria. Revisit your request.",
+                "Even Gandalf is unsure about this request. Please correct it.",
+                "The Shire's peacefulness is disturbed. Review your input.",
+                "The Balrog awakens! There seems to be an issue with your request.",
+                "The White Tree of Gondor does not recognize this data. Check your input.",
+                "A Nazgûl is nearby, which might explain the invalid request. Please try again.",
+                "Gollum seems to have stolen your valid input. Revisit your request.",
+                "The Ents are not happy with this. Make sure your request is correct.",
+                "The Palantír shows an error. Your request needs correction.",
+                "Aragorn's Rangers have found a problem in your input. Please review it.",
+                "The gates to Erebor are closed. You need the correct key to proceed.",
+                "The Great Eagles have spotted an error. Double-check your request.",
+                "Frodo lost your request on his way to Mount Doom. Please resubmit."
+            };
+
+            Random random = new Random(); // Random number generator
+            int index = random.Next(responses.Length); // Randomly select an index from 0 to the length of the responses array
+            return responses[index]; // Return the selected response
         }
         #endregion
     }
