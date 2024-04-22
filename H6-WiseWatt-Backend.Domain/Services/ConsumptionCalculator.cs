@@ -3,6 +3,10 @@ using H6_WiseWatt_Backend.Domain.Interfaces;
 
 namespace H6_WiseWatt_Backend.Domain.Services
 {
+    /// <summary>
+    /// Analyze electricity consumption for IoT devices. It integrates device management to get users devices
+    /// and electricity pricing, providing a suite of methods to compute and retrieve consumption data.
+    /// </summary>
     public class ConsumptionCalculator : IConsumptionCalculator
     {
         private readonly IDeviceManager _deviceManager;
@@ -14,6 +18,13 @@ namespace H6_WiseWatt_Backend.Domain.Services
             _electricPriceService = electricPriceService;
         }
 
+        /// <summary>
+        /// Returns a list of daily consumption summaries for a specific user. 
+        /// The summary includes the device name, daily consumption in kWh, and the associated cost. 
+        /// It also calculates a total consumption and cost.
+        /// </summary>
+        /// <param name="userGuid">Current users unique Id</param>
+        /// <returns>list of daily consumption summaries for a specific user</returns>
         public async Task<List<Tuple<string, double, double>>> GetSummaryOfDailyConsumption(string userGuid)
         {
             var devices = await GetUserDevices(userGuid);
@@ -46,11 +57,11 @@ namespace H6_WiseWatt_Backend.Domain.Services
             return result;
         }
 
-        private async Task<List<IoTDeviceBaseEntity>> GetUserDevices(string userGuid)
-        {
-            return await _deviceManager.GetDevices(userGuid);
-        }
-
+        /// <summary>
+        /// Returns a dictionary mapping each device's name to its percentage share of total daily consumption for a given user.
+        /// </summary>
+        /// <param name="userGuid">Current users unique Id</param>
+        /// <returns>Dictionary mapping each device's name to its percentage share of total daily consumption</returns>
         public async Task<Dictionary<string, double>> GetDailyPercentageByDevice(string userGuid)
         {
             var devices = await GetUserDevices(userGuid);
@@ -74,6 +85,11 @@ namespace H6_WiseWatt_Backend.Domain.Services
             return result;
         }
 
+        /// <summary>
+        /// Returns a dictionary mapping each device's name to its hourly consumption over a 24-hour period.
+        /// </summary>
+        /// <param name="userGuid">Current users unique Id</param>
+        /// <returns>Dictionary mapping each device's name to its hourly consumption over a 24-hour</returns>
         public async Task<Dictionary<string, List<double>>> GetHourlyConsumptionByDevice(string userGuid)
         {
             var devices = await GetUserDevices(userGuid);
@@ -86,21 +102,39 @@ namespace H6_WiseWatt_Backend.Domain.Services
             return result;
         }
 
+        /// <summary>
+        /// A private helper method that fetches the list of devices associated with a given user.
+        /// </summary>
+        /// <param name="userGuid"Current users unique Id></param>
+        /// <returns>List of devices</returns>
+        private async Task<List<IoTDeviceBaseEntity>> GetUserDevices(string userGuid)
+        {
+            return await _deviceManager.GetDevices(userGuid);
+        }
+
+        /// <summary>
+        /// Computes the daily energy consumption for a given device based on its operation schedule and energy consumption rate.
+        /// </summary>
+        /// <param name="device">Current IoT Device</param>
+        /// <returns>Daily energy consumption</returns>
         private double CalculateDailyUsage(IoTDeviceBaseEntity device)
         {
+            // Device runs for 24 hours if manually operated.
             if (device.IsManuallyOperated)
             {
-                return 24 * device.EnergyConsumption;  // Device runs for 24 hours if manually operated.
+                return 24 * device.EnergyConsumption;  
             }
             else
             {
+                // If OnTime and OffTime are the same, no energy is consumed.
                 if (device.OnTime == device.OffTime)
                 {
-                    return 0; // If OnTime and OffTime are the same, no energy is consumed.
+                    return 0; 
                 }
 
                 TimeSpan duration = device.OffTime - device.OnTime;
-                if (device.OffTime < device.OnTime) // Over midnight case
+                // Over midnight case
+                if (device.OffTime < device.OnTime) 
                 {
                     duration += TimeSpan.FromDays(1);
                 }
@@ -108,13 +142,18 @@ namespace H6_WiseWatt_Backend.Domain.Services
             }
         }
 
-
+        /// <summary>
+        /// Computes the hourly energy consumption for a given device based on its operation schedule and energy consumption rate.
+        /// </summary>
+        /// <param name="device">Current device</param>
+        /// <returns>Hourly device energy consumption</returns>
         private List<double> CalculateHourlyUsage(IoTDeviceBaseEntity device)
         {
             var hourlyConsumption = new List<double>(new double[24]);
-            if (device.OnTime == device.OffTime && !device.IsManuallyOperated)
+                        
+            if (HasNoConsumption(device))
             {
-                return hourlyConsumption; // No consumption if times are the same and not manually operated.
+                return hourlyConsumption;
             }
 
             // Device runs for 24 hours if manually operated.
@@ -127,9 +166,10 @@ namespace H6_WiseWatt_Backend.Domain.Services
                 return hourlyConsumption;
             }
 
+            // Device runs by timer
             int startHour = device.OnTime.Hours;
             int endHour = device.OffTime.Hours;
-            if (endHour < startHour) // Over midnight case
+            if (IsOverMidnight(startHour, endHour))
             {
                 for (int hour = startHour; hour < 24; hour++)
                 {
@@ -149,6 +189,27 @@ namespace H6_WiseWatt_Backend.Domain.Services
             }
 
             return hourlyConsumption;
+        }
+
+        /// <summary>
+        /// No consumption if times are the same and not manually operated.
+        /// </summary>
+        /// <param name="device">Current Device</param>
+        /// <returns>boolean</returns>
+        private bool HasNoConsumption(IoTDeviceBaseEntity device)
+        {
+            return device.OnTime == device.OffTime && !device.IsManuallyOperated;
+        }
+
+        /// <summary>
+        /// Determines if a device's operating schedule crosses midnight, used to correctly calculate consumption.
+        /// </summary>
+        /// <param name="startHour"></param>
+        /// <param name="endHour"></param>
+        /// <returns>true/false</returns>
+        private bool IsOverMidnight(int startHour, int endHour)
+        {
+            return endHour < startHour;
         }
     }
 }

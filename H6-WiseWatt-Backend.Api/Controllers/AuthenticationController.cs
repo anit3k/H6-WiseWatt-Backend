@@ -1,5 +1,4 @@
 ﻿using H6_WiseWatt_Backend.Api.Models;
-using H6_WiseWatt_Backend.Api.Utils;
 using H6_WiseWatt_Backend.Domain.Entities;
 using H6_WiseWatt_Backend.Domain.Interfaces;
 using H6_WiseWatt_Backend.Security.Interfaces;
@@ -12,13 +11,11 @@ namespace H6_WiseWatt_Backend.Api.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly IUserManager _userManager;
-        private readonly UserDTOMapper _userMapper;
         private readonly ITokenGenerator _tokenGen;
 
-        public AuthenticationController(IUserManager userManager, UserDTOMapper userMapper, ITokenGenerator tokenGen)
+        public AuthenticationController(IUserManager userManager, ITokenGenerator tokenGen)
         {
             _userManager = userManager;
-            _userMapper = userMapper;
             _tokenGen = tokenGen;
         }
 
