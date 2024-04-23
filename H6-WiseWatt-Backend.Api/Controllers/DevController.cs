@@ -25,7 +25,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         #endregion
 
         #region Constructor
-        public DevController(MySqlDbContext dbContext,IPasswordHasher passwordService, IDeviceFactory deviceFactory, IDeviceRepo deviceStorageRepo, IElectricPriceService priceService)
+        public DevController(MySqlDbContext dbContext, IPasswordHasher passwordService, IDeviceFactory deviceFactory, IDeviceRepo deviceStorageRepo, IElectricPriceService priceService)
         {
             _dbContext = dbContext;
             _passwordService = passwordService;
@@ -36,25 +36,32 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         #endregion
 
         #region Public Methods
-                /// <summary>
+        /// <summary>
         /// This method is used for development purpose, and is used to reset the database,
         /// add a default test user, and retrieve the current electricity prices.
         /// </summary>
         /// <returns></returns>
         [HttpGet]
         [Route("api/dev/reset")]
-        public async Task<IActionResult> ResetDb()
+        public async Task<IActionResult> ResetDb(ShireToken key)
         {
             try
             {
-                await _dbContext.Database.EnsureDeletedAsync();
-                await _dbContext.Database.EnsureCreatedAsync();
-                _dbContext.ChangeTracker.Clear();
-                await AddDefaultTestUser();
-                 var temp = await _priceService.GetElectricityPricesAsync();
+                if (CheckElvenPassword(key))
+                {
+                    await _dbContext.Database.EnsureDeletedAsync();
+                    await _dbContext.Database.EnsureCreatedAsync();
+                    _dbContext.ChangeTracker.Clear();
+                    await AddDefaultTestUser();
+                    var temp = await _priceService.GetElectricityPricesAsync();
 
-                Log.Information("The Database has been reset");
-                return Ok("Db has been reset");
+                    Log.Information("The Database has been reset");
+                    return Ok("Db has been reset");
+                }
+                else
+                {
+                    return BadRequest(GetRandomResponse());
+                }
             }
             catch (Exception ex)
             {
@@ -65,8 +72,16 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         #endregion
 
         #region Private Methods
+
+        private bool CheckElvenPassword(ShireToken key)
+        {
+            return key.ElvenFriend == "Mellon";
+        }
+
+
+
         /// <summary>
-        /// Creates the deafult test user, this user i also the one hocked on or IoT simulations
+        /// Creates the default test user, this user i also the one hocked on or IoT simulations
         /// </summary>
         private async Task AddDefaultTestUser()
         {
@@ -81,7 +96,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 Salt = salt,
                 UserGuid = "f10774ec-bc8b-40a6-9049-32634363e298"
             };
-            _dbContext.Users.Add(user); 
+            _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
 
             var devices = _deviceFactory.CreateDefaultDevices();
@@ -120,6 +135,37 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                     throw new NotImplementedException();
             }
         }
+
+        private string GetRandomResponse()
+        {
+            string[] responses = new[]
+            {
+                "The Eye of Sauron has noticed an error. Double-check your input.",
+                "You shall not pass! The request is invalid.",
+                "Something went wrong in the Mines of Moria. Revisit your request.",
+                "Even Gandalf is unsure about this request. Please correct it.",
+                "The Shire's peacefulness is disturbed. Review your input.",
+                "The Balrog awakens! There seems to be an issue with your request.",
+                "The White Tree of Gondor does not recognize this data. Check your input.",
+                "A Nazgûl is nearby, which might explain the invalid request. Please try again.",
+                "Gollum seems to have stolen your valid input. Revisit your request.",
+                "The Ents are not happy with this. Make sure your request is correct.",
+                "The Palantír shows an error. Your request needs correction.",
+                "Aragorn's Rangers have found a problem in your input. Please review it.",
+                "The gates to Erebor are closed. You need the correct key to proceed.",
+                "The Great Eagles have spotted an error. Double-check your request.",
+                "Frodo lost your request on his way to Mount Doom. Please resubmit."
+            };
+
+            Random random = new Random(); // Random number generator
+            int index = random.Next(responses.Length); // Randomly select an index from 0 to the length of the responses array
+            return responses[index]; // Return the selected response
+        }
         #endregion
+    }
+
+    public class ShireToken
+    {
+        public string ElvenFriend { get; set; }
     }
 }
