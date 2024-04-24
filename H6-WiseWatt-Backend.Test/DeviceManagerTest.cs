@@ -108,6 +108,7 @@ namespace H6_WiseWatt_Backend.Test
             device.IsManuallyOperated = false;
             _mockDeviceRepo.Setup(r => r.GetDevice(serialNo)).ReturnsAsync(device);
 
+
             // Act
             var result = await _deviceManager.GetDevice(serialNo);
 
@@ -123,6 +124,7 @@ namespace H6_WiseWatt_Backend.Test
             // Re-Act
             await _deviceManager.UpdateDevice(device);
             var result2 = await _deviceManager.GetDevice(serialNo);
+            _mockDeviceRepo.Verify(r => r.UpdateDevice(device), Times.Once);
 
             // Re-Assert
             Assert.IsNotNull(result);
