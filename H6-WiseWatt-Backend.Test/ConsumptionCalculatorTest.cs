@@ -1,5 +1,4 @@
 ﻿using H6_WiseWatt_Backend.Domain.Entities;
-using H6_WiseWatt_Backend.Domain.Entities.IotEntities;
 using H6_WiseWatt_Backend.Domain.Interfaces;
 using H6_WiseWatt_Backend.Domain.Services;
 using Moq;
@@ -44,23 +43,23 @@ namespace H6_WiseWatt_Backend.Tests
             _mockElectricPriceService.Setup(m => m.GetElectricityPricesAsync()).ReturnsAsync(prices);
 
             // Act
-            var summary = await _calculator.GetSummaryOfDailyConsumption(userGuid);
+            var result = await _calculator.GetSummaryOfDailyConsumption(userGuid);
 
             // Assert
-            Assert.IsNotNull(summary);
-            Assert.That(summary.Count, Is.EqualTo(6));
-            Assert.That(6, Is.EqualTo(summary[0].Item2)); // current consumption
-            Assert.That(summary[0].Item3, Is.EqualTo(1.2000000000000002)); // current cost
-            Assert.That(6, Is.EqualTo(summary[1].Item2)); 
-            Assert.That(summary[1].Item3, Is.EqualTo(1.2000000000000002));
-            Assert.That(6, Is.EqualTo(summary[2].Item2));   
-            Assert.That(summary[2].Item3, Is.EqualTo(1.2000000000000002));
-            Assert.That(6, Is.EqualTo(summary[3].Item2)); 
-            Assert.That(summary[3].Item3, Is.EqualTo(1.2000000000000002));
-            Assert.That(6, Is.EqualTo(summary[4].Item2)); 
-            Assert.That(summary[4].Item3, Is.EqualTo(1.2000000000000002));
-            Assert.That(30, Is.EqualTo(summary[5].Item2)); // total consumption
-            Assert.That(summary[5].Item3, Is.EqualTo(6.000000000000001)); // total cost
+            Assert.IsNotNull(result);
+            Assert.That(result.Count, Is.EqualTo(6));
+            Assert.That(6, Is.EqualTo(result[0].Item2)); // current consumption
+            Assert.That(result[0].Item3, Is.EqualTo(1.2000000000000002)); // current cost
+            Assert.That(6, Is.EqualTo(result[1].Item2)); 
+            Assert.That(result[1].Item3, Is.EqualTo(1.2000000000000002));
+            Assert.That(6, Is.EqualTo(result[2].Item2));   
+            Assert.That(result[2].Item3, Is.EqualTo(1.2000000000000002));
+            Assert.That(6, Is.EqualTo(result[3].Item2)); 
+            Assert.That(result[3].Item3, Is.EqualTo(1.2000000000000002));
+            Assert.That(6, Is.EqualTo(result[4].Item2)); 
+            Assert.That(result[4].Item3, Is.EqualTo(1.2000000000000002));
+            Assert.That(30, Is.EqualTo(result[5].Item2)); // total consumption
+            Assert.That(result[5].Item3, Is.EqualTo(6.000000000000001)); // total cost
         }
 
         [Test]
@@ -81,17 +80,17 @@ namespace H6_WiseWatt_Backend.Tests
             _mockDeviceManager.Setup(m => m.GetDevices(It.IsAny<string>())).ReturnsAsync(devices);
 
             // Act
-            var percentages = await _calculator.GetDailyPercentageByDevice(userGuid);
+            var result = await _calculator.GetDailyPercentageByDevice(userGuid);
 
             // Assert
-            Assert.IsNotNull(percentages);
-            Assert.That(percentages.Count, Is.EqualTo(5));
-            Assert.Greater(percentages["Opvaskemaskine"], 0);
-            Assert.Greater(percentages["Tørretumbler"], 0);
-            Assert.Greater(percentages["Ladestander"], 0);
-            Assert.Greater(percentages["Varmepumpe"], 0);
-            Assert.Greater(percentages["Vaskemaskine"], 0);
-            foreach (var device in percentages)
+            Assert.IsNotNull(result);
+            Assert.That(result.Count, Is.EqualTo(5));
+            Assert.Greater(result["Opvaskemaskine"], 0);
+            Assert.Greater(result["Tørretumbler"], 0);
+            Assert.Greater(result["Ladestander"], 0);
+            Assert.Greater(result["Varmepumpe"], 0);
+            Assert.Greater(result["Vaskemaskine"], 0);
+            foreach (var device in result)
             {
                 Assert.That(device.Value, Is.EqualTo(20));
             }
@@ -115,23 +114,23 @@ namespace H6_WiseWatt_Backend.Tests
             _mockDeviceManager.Setup(m => m.GetDevices(It.IsAny<string>())).ReturnsAsync(devices);
 
             // Act
-            var hourlyData = await _calculator.GetHourlyConsumptionByDevice(userGuid);
+            var result = await _calculator.GetHourlyConsumptionByDevice(userGuid);
 
             // Assert
-            Assert.IsNotNull(hourlyData);
-            Assert.That(hourlyData.Count, Is.EqualTo(5));
-            Assert.IsTrue(hourlyData.ContainsKey("Opvaskemaskine")); 
-            Assert.That(hourlyData["Opvaskemaskine"].Count, Is.EqualTo(24));
-            Assert.IsTrue(hourlyData.ContainsKey("Tørretumbler")); 
-            Assert.That(hourlyData["Tørretumbler"].Count, Is.EqualTo(24));
-            Assert.IsTrue(hourlyData.ContainsKey("Ladestander")); 
-            Assert.That(hourlyData["Ladestander"].Count, Is.EqualTo(24));
-            Assert.IsTrue(hourlyData.ContainsKey("Varmepumpe")); 
-            Assert.That(hourlyData["Varmepumpe"].Count, Is.EqualTo(24));
-            Assert.IsTrue(hourlyData.ContainsKey("Vaskemaskine")); 
-            Assert.That(hourlyData["Vaskemaskine"].Count, Is.EqualTo(24));
+            Assert.IsNotNull(result);
+            Assert.That(result.Count, Is.EqualTo(5));
+            Assert.IsTrue(result.ContainsKey("Opvaskemaskine")); 
+            Assert.That(result["Opvaskemaskine"].Count, Is.EqualTo(24));
+            Assert.IsTrue(result.ContainsKey("Tørretumbler")); 
+            Assert.That(result["Tørretumbler"].Count, Is.EqualTo(24));
+            Assert.IsTrue(result.ContainsKey("Ladestander")); 
+            Assert.That(result["Ladestander"].Count, Is.EqualTo(24));
+            Assert.IsTrue(result.ContainsKey("Varmepumpe")); 
+            Assert.That(result["Varmepumpe"].Count, Is.EqualTo(24));
+            Assert.IsTrue(result.ContainsKey("Vaskemaskine")); 
+            Assert.That(result["Vaskemaskine"].Count, Is.EqualTo(24));
 
-            foreach (var device in hourlyData)
+            foreach (var device in result)
             {
                 for (int i = 0; i < device.Value.Count; i++)
                 {
