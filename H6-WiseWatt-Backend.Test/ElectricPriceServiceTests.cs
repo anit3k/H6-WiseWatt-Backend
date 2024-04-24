@@ -1,12 +1,7 @@
-﻿using NUnit.Framework;
-using H6_WiseWatt_Backend.Domain.Services;
-using H6_WiseWatt_Backend.Domain.Entities;
+﻿using H6_WiseWatt_Backend.Domain.Entities;
 using H6_WiseWatt_Backend.Domain.Interfaces;
+using H6_WiseWatt_Backend.Domain.Services;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace H6_WiseWatt_Backend.Tests
 {
