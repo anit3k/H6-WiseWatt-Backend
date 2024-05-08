@@ -3,9 +3,6 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace H6_WiseWatt_Backend.MongoData.Models
 {
-    /// <summary>
-    /// Data model for storing user-related information in a MySQL database. It corresponds to the UserEntity class used in the application's domain logic.
-    /// </summary>
     public class UserDbModel
     {
         #region Properties

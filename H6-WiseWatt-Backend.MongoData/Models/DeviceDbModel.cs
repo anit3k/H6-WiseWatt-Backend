@@ -4,9 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace H6_WiseWatt_Backend.MongoData.Models
 {
-    /// <summary>
-    /// Data model for storing device-related information in a MySQL database. It corresponds to the Device entity class used in the application's domain logic.
-    /// </summary>
     public class DeviceDbModel
     {
         #region Properties
