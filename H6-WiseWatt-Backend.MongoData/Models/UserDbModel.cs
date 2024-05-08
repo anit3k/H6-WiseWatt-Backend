@@ -5,7 +5,6 @@ namespace H6_WiseWatt_Backend.MongoData.Models
 {
     public class UserDbModel
     {
-        #region Properties
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
@@ -15,7 +14,6 @@ namespace H6_WiseWatt_Backend.MongoData.Models
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public string Salt { get; set; }
-        #endregion
     }
 }
-}
+

@@ -5,7 +5,6 @@ namespace H6_WiseWatt_Backend.MongoData.Models
 {
     public class ElectricityPriceDbModel
     {
-        #region Properties
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
@@ -13,6 +12,5 @@ namespace H6_WiseWatt_Backend.MongoData.Models
         public double PricePerKwh { get; set; }
         public double TransportAndDuties { get; set; }
         public double TotalPrice { get; set; }
-        #endregion
     }
 }

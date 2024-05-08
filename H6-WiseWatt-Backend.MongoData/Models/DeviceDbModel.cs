@@ -6,7 +6,6 @@ namespace H6_WiseWatt_Backend.MongoData.Models
 {
     public class DeviceDbModel
     {
-        #region Properties
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
@@ -30,6 +29,5 @@ namespace H6_WiseWatt_Backend.MongoData.Models
         [Column(TypeName = "time")]
         public TimeSpan OffTime { get; set; }
         public int Degree { get; set; }
-        #endregion
     }
 }

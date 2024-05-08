@@ -5,7 +5,6 @@ namespace H6_WiseWatt_Backend.MongoData.Utils
 {
     public class ElectricityPriceDbMapper
     {
-        #region Internal Methods
         internal ElectricityPriceEntity MapToPriceEntity(ElectricityPriceDbModel pm)
         {
             return new ElectricityPriceEntity
@@ -27,6 +26,5 @@ namespace H6_WiseWatt_Backend.MongoData.Utils
                 TotalPrice = pu.TotalPrice,
             };
         }
-        #endregion
     }
 }

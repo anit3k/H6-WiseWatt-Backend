@@ -5,7 +5,6 @@ namespace H6_WiseWatt_Backend.MongoData.Utils
 {
     public class DeviceDbMapper
     {
-        #region Internal Methods
         internal DeviceDbModel MapToDeviceDbModel(IoTDeviceBaseEntity entity)
         {
             var model = new DeviceDbModel
@@ -67,6 +66,5 @@ namespace H6_WiseWatt_Backend.MongoData.Utils
 
             return entity;
         }
-        #endregion
     }
 }

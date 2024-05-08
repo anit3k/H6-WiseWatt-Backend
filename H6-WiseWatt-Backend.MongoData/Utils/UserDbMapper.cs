@@ -5,7 +5,6 @@ namespace H6_WiseWatt_Backend.MongoData.Utils
 {
     public class UserDbMapper
     {
-        #region Internal Methods
         internal UserDbModel MapToUserDbModel(UserEntity user, string passwordHash, string salt)
         {
             return new UserDbModel
@@ -30,6 +29,5 @@ namespace H6_WiseWatt_Backend.MongoData.Utils
                 Password = password,
             };
         }
-        #endregion
     }
 }
