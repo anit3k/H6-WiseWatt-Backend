@@ -1,7 +1,7 @@
 ﻿using H6_WiseWatt_Backend.Domain.Entities.IotEntities;
 using H6_WiseWatt_Backend.Domain.Interfaces;
-using H6_WiseWatt_Backend.MySqlData;
-using H6_WiseWatt_Backend.MySqlData.Models;
+using H6_WiseWatt_Backend.MongoData;
+using H6_WiseWatt_Backend.MongoData.Models;
 using H6_WiseWatt_Backend.Security.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -17,7 +17,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
     public class DevController : ControllerBase
     {
         #region private fields
-        private readonly MySqlDbContext _dbContext;
+        private readonly MongoDbContext _dbContext;
         private readonly IPasswordHasher _passwordService;
         private readonly IDeviceFactory _deviceFactory;
         private readonly IDeviceRepo _deviceRepo;
@@ -25,7 +25,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
         #endregion
 
         #region Constructor
-        public DevController(MySqlDbContext dbContext, IPasswordHasher passwordService, IDeviceFactory deviceFactory, IDeviceRepo deviceStorageRepo, IElectricPriceService priceService)
+        public DevController(MongoDbContext dbContext, IPasswordHasher passwordService, IDeviceFactory deviceFactory, IDeviceRepo deviceStorageRepo, IElectricPriceService priceService)
         {
             _dbContext = dbContext;
             _passwordService = passwordService;
@@ -49,9 +49,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
             {
                 if (CheckElvenPassword(key))
                 {
-                    await _dbContext.Database.EnsureDeletedAsync();
-                    await _dbContext.Database.EnsureCreatedAsync();
-                    _dbContext.ChangeTracker.Clear();
+                    _dbContext.ResetDb();
                     await AddDefaultTestUser();
                     var temp = await _priceService.GetElectricityPricesAsync();
 
@@ -96,8 +94,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 Salt = salt,
                 UserGuid = "f10774ec-bc8b-40a6-9049-32634363e298"
             };
-            _dbContext.Users.Add(user);
-            await _dbContext.SaveChangesAsync();
+            _dbContext.Users.InsertOne(user);
 
             var devices = _deviceFactory.CreateDefaultDevices();
 

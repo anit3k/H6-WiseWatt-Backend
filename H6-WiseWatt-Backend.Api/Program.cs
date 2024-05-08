@@ -1,8 +1,8 @@
 using H6_WiseWatt_Backend.Api.Utils;
 using H6_WiseWatt_Backend.Domain.Interfaces;
 using H6_WiseWatt_Backend.Domain.Services;
-using H6_WiseWatt_Backend.MySqlData;
-using H6_WiseWatt_Backend.MySqlData.Utils;
+using H6_WiseWatt_Backend.MongoData;
+using H6_WiseWatt_Backend.MongoData.Utils;
 using H6_WiseWatt_Backend.Security;
 using H6_WiseWatt_Backend.Security.Interfaces;
 using H6_WiseWatt_Backend.Security.Models;
@@ -30,7 +30,7 @@ builder.Services.AddTransient<DeviceDTOMapper>();
 builder.Services.AddTransient<UserDTOMapper>();
 
 // Data Specific
-builder.Services.AddTransient<MySqlDbContext>();
+builder.Services.AddTransient<MongoDbContext>();
 builder.Services.AddTransient<IUserRepo, UserRepo>();
 builder.Services.AddTransient<UserDbMapper>();
 builder.Services.AddTransient<IDeviceRepo, DeviceRepo>();

@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\H6-WiseWatt-Backend.Domain\H6-WiseWatt-Backend.Domain.csproj" />
+    <ProjectReference Include="..\H6-WiseWatt-Backend.MongoData\H6-WiseWatt-Backend.MongoData.csproj" />
     <ProjectReference Include="..\H6-WiseWatt-Backend.Security\H6-WiseWatt-Backend.Security.csproj" />
   </ItemGroup>
 
