@@ -1,4 +1,7 @@
-﻿namespace H6_WiseWatt_Backend.MySqlData.Models
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
+namespace H6_WiseWatt_Backend.MongoData.Models
 {
     /// <summary>
     /// Data model for storing user-related information in a MySQL database. It corresponds to the UserEntity class used in the application's domain logic.
@@ -6,7 +9,9 @@
     public class UserDbModel
     {
         #region Properties
-        public int Id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
         public string UserGuid { get; set; }
         public string Firstname { get; set; }
         public string Lastname { get; set; }
@@ -15,4 +20,5 @@
         public string Salt { get; set; }
         #endregion
     }
+}
 }

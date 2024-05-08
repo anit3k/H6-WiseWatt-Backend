@@ -1,20 +1,11 @@
 ﻿using H6_WiseWatt_Backend.Domain.Entities.IotEntities;
-using H6_WiseWatt_Backend.MySqlData.Models;
+using H6_WiseWatt_Backend.MongoData.Models;
 
-namespace H6_WiseWatt_Backend.MySqlData.Utils
+namespace H6_WiseWatt_Backend.MongoData.Utils
 {
-    /// <summary>
-    /// Provides methods for mapping between IoTDeviceBaseEntity objects and DeviceDbModel objects. 
-    /// These mappings facilitate the transfer of data between the domain entities and the database models.
-    /// </summary>
     public class DeviceDbMapper
     {
         #region Internal Methods
-        /// <summary>
-        /// Maps an IoTDeviceBaseEntity object to a DeviceDbModel object.
-        /// </summary>
-        /// <param name="entity">IoTDeviceBaseEntity</param>
-        /// <returns>DeviceDbModel</returns>
         internal DeviceDbModel MapToDeviceDbModel(IoTDeviceBaseEntity entity)
         {
             var model = new DeviceDbModel
@@ -48,11 +39,6 @@ namespace H6_WiseWatt_Backend.MySqlData.Utils
             return model;
         }
 
-        /// <summary>
-        /// Performs mapping, converting a DeviceDbModel object to an IoTDeviceBaseEntity object.
-        /// </summary>
-        /// <param name="model">DeviceDbModel</param>
-        /// <returns>IoTDeviceBaseEntityreturns>
         internal IoTDeviceBaseEntity MapToDeviceEntity(DeviceDbModel model)
         {
             IoTDeviceBaseEntity entity = model.DeviceType switch

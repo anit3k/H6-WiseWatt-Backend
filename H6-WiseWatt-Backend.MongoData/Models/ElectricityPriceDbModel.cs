@@ -1,4 +1,7 @@
-﻿namespace H6_WiseWatt_Backend.MySqlData.Models
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
+namespace H6_WiseWatt_Backend.MongoData.Models
 {
     /// <summary>
     /// Data model for storing electricity price-related information in a MySQL database. 
@@ -7,7 +10,9 @@
     public class ElectricityPriceDbModel
     {
         #region Properties
-        public int Id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
         public DateTime TimeStamp { get; set; }
         public double PricePerKwh { get; set; }
         public double TransportAndDuties { get; set; }

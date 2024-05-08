@@ -1,6 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace H6_WiseWatt_Backend.MySqlData.Models
+namespace H6_WiseWatt_Backend.MongoData.Models
 {
     /// <summary>
     /// Data model for storing device-related information in a MySQL database. It corresponds to the Device entity class used in the application's domain logic.
@@ -8,8 +10,10 @@ namespace H6_WiseWatt_Backend.MySqlData.Models
     public class DeviceDbModel
     {
         #region Properties
-        public int Id { get; set; }
-       
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
+
         public string UserGuid { get; set; }
 
         public string DeviceType { get; set; }

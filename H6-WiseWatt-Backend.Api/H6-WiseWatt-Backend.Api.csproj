@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\H6-WiseWatt-Backend.Domain\H6-WiseWatt-Backend.Domain.csproj" />
-    <ProjectReference Include="..\H6-WiseWatt-Backend.MySqlData\H6-WiseWatt-Backend.MySqlData.csproj" />
     <ProjectReference Include="..\H6-WiseWatt-Backend.Security\H6-WiseWatt-Backend.Security.csproj" />
   </ItemGroup>
 
