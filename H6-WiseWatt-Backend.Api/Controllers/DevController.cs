@@ -69,6 +69,42 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 return StatusCode(500, $"Internal Server Error, contact your administrator if continues.../n" + ex.Message);
             }
         }
+
+        [HttpGet]
+        [Route("api/dev/timer")]
+        public async Task<IActionResult> SetTimer(TimerDTO time)
+        {
+            try
+            {
+                var devices = await _deviceRepo.GetDevices("f10774ec-bc8b-40a6-9049-32634363e298");
+                if (devices == null || devices.Count == 0)
+                    return NotFound("No devices found.");
+
+                var now = DateTime.UtcNow;
+                var totalMinutes = time.Timer;
+                var incrementPerDevice = totalMinutes / (float)devices.Count;
+
+                for (int i = 0; i < devices.Count; i++)
+                {
+                    var device = devices[i];
+                    device.IsManuallyOperated = false;
+                    device.OnTime = now.TimeOfDay;
+                    device.OffTime = now.AddMinutes(incrementPerDevice * (i + 1)).TimeOfDay;
+                                        
+                    await _deviceRepo.UpdateDevice(device);
+                }
+
+                return Ok("Timer has been set!");
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"An error has occurred with error message: {ex.Message}");
+                return StatusCode(500, $"Internal Server Error, contact your administrator if continues...\n" + ex.Message);
+            }
+        }
+
+
+
         #endregion
 
         #region Private Methods
@@ -167,5 +203,10 @@ namespace H6_WiseWatt_Backend.Api.Controllers
     public class ShireToken
     {
         public string ElvenFriend { get; set; }
+    }
+
+    public class TimerDTO
+    {
+        public int Timer { get; set; }
     }
 }
