@@ -80,7 +80,7 @@ namespace H6_WiseWatt_Backend.Api.Controllers
                 if (devices == null || devices.Count == 0)
                     return NotFound("No devices found.");
 
-                var now = DateTime.UtcNow;
+                var now = DateTime.Now;
                 var totalMinutes = time.Timer;
                 var incrementPerDevice = totalMinutes / (float)devices.Count;
 
